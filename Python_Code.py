@@ -1,88 +1,91 @@
-## Data Source 1 - Data from Kaggle as a csv File:
 
-# Importing Country Statistics csv data:
+### Data Source 1 - Data from Kaggle Public Dataset - Country Statistics – UNData:
+
+## Step 1 - Importing csv File into Pandas DataFrame and understanding the data therein -
+# loading Pandas library (alias pd):
 import pandas as pd
-
-#file_path = r'D:\Learning\UCD Professional Academy\Course 1 - Professional Certificate in Data Analytics\Course 1 - Final Project\country_profile_variables.csv'
+# reading data from the csv file and storing it into the variable data:
 data = pd.read_csv('country_profile_variables.csv')
-
-# studying the data size:
+# studying the data size (rows & columns) using the shape attribute:
 print(data.shape)
-
-# getting a snapshot of data and its column:
-print(data.head(5))
-
-# Check for NaN under an entire DataFrame:
+# getting a snapshot of first 5 rows of data using the head() method:
+print(data.head())
+# checking if any value in the dataset is missing (detect NaN values):
 print(data.isnull().values.any())
 
-# Detecting any missing values:
-print(data.isna().values.any())
 
-
-# Create an array BRICS_members and return a DataFrame data rows where country column value is in the iterable array:
+## Step 2 - Slicing the entire dataset for BRICS member countries data only -
+# creating an array of BRICS member countries:
 BRICS_members = ['Brazil','Russian Federation','India','China','South Africa']
+# slicing the entire dataset rows for those where country column value is in the above iterable array:
 BRICS_country_stats = data.loc[data['country'].isin(BRICS_members)]
 BRICS_country_stats
-
-# Set index for BRICS_country_stats DataFrame and slice similar column as for regional_stats  DataFrame:
+# slicing only demographic & income indicators columns for BRICS member countries:
 BRICS_country_stats2 = BRICS_country_stats[['country','Region','Population in thousands (2017)','Population density (per km2, 2017)','GDP per capita (current US$)']]
+# setting the index for the BRICS member countries DataFrame:
 BRICS_country_stats2.set_index('country',inplace = True)
+# printing the DataFrame:
 print(BRICS_country_stats2)
 
 
-# First grouping based on "Region"
-# Within each team we are grouping based on "country"
-grouped = data.groupby(['Region','country'])
-
-# Group data by region and aggregate them by sum total and mean values for each region:
+## Step 3 - Slicing the data for the respective Regions of each BRICS member countries only-
+# loading the Numpy library (alias np):
 import numpy as np
-
+# grouping the entire dataset by "Region" and storing it in variable grouped2:
 grouped2 = data.groupby(['Region'])
+# slicing the grouped dataset for 3 indicators and aggregating each of them by sum and mean values:
+# slicing the population density column & aggregating for sum & mean; also rounding to 2 decimal places
 pop_density_group = grouped2['Population density (per km2, 2017)'].agg([np.sum,np.mean]).round(2)
+# slicing the GDP per capita column & aggregating for sum & mean; also rounding to 2 decimal places
 GDP_per_capita_group = grouped2['GDP per capita (current US$)'].agg([np.sum,np.mean]).round(2)
+# slicing the total population column & aggregating for sum & mean; also rounding to 2 decimal places
 pop_group = grouped2['Population in thousands (2017)'].agg([np.sum,np.mean]).round(2)
 
-# Indexing and slicing regional statistics for BRIC member countries' Regions only:
+# indexing and slicing regional statistics for respective Regions of BRICS member countries only:
+# indexing and slicing total population data:
 regional_tot_pop = pop_group.loc[['EasternAsia','EasternEurope','SouthAmerica','SouthernAfrica','SouthernAsia']]
+# indexing and slicing population density data:
 regional_pop_density = pop_density_group.loc[['EasternAsia','EasternEurope','SouthAmerica','SouthernAfrica','SouthernAsia']]
+# indexing and slicing GDP per capita data:
 regional_GDP_percap = GDP_per_capita_group.loc[['EasternAsia','EasternEurope','SouthAmerica','SouthernAfrica','SouthernAsia']]
 
-# Joining regional DataFrames for tot_pop, pop_density and GDP per cap and named it regional_stats:
-import pandas as pd
-
+# joining regional statistics DataFrames for tot_pop, pop_density and GDP per cap and storing it in variable - regional_stats:
 regional_comb = regional_tot_pop.join(regional_pop_density,lsuffix='_tot_pop',rsuffix='_pop_dens')
 regional_stats = regional_comb.join(regional_GDP_percap,lsuffix='_pop_dens',rsuffix='_GDP_percap')
 
-# renamed columns for Combined Regional statistics:
+# renaming the columns for the combined Regional statistics DataFrame as regional_stats:
 regional_stats.rename(columns={'sum':'sum_GDP_percap','mean': 'mean_GDP_percap'},inplace=True)
+# printing the DataFrame:
 print(regional_stats)
 
-import matplotlib.pyplot as plt
 
-# Bar Chart for tot_pop for each Region:
+## Chart 1 - Visualizing Dempgraphic & Income Indicators of BRICS member's vs. their respective Regions in Bar Chart Subplots:
+# loading Matplotlib library (alias as plt):
+import matplotlib.pyplot as plt
+# creating a Figure and Axes objects (2 rows and 3 columns) and defining the figure size of the chart:
 fig,ax = plt.subplots(2,3,figsize=(15,8))
 
-# Plotting the Regional Graphs on Bottom row of the Subplot for all 3 indicators:
+# plotting the Regional Graphs on Bottom row of the Subplot for all 3 indicators and defining color of each country's region bar:
 ax[1][0].bar(regional_stats.index,regional_stats['sum_tot_pop'],color=['black', 'red', 'green', 'blue', 'cyan'])
 ax[1][1].bar(regional_stats.index,regional_stats['sum_pop_dens'],color=['black', 'red', 'green', 'blue', 'cyan'])
 ax[1][2].bar(regional_stats.index,regional_stats['sum_GDP_percap'],color=['black', 'red', 'green', 'blue', 'cyan'])
 
-# Plotting each BRICS memebr country Graphs on Top row of the Subplot for all 3 indicators:
+# plotting each BRICS member country Graphs on Top row of the Subplot for all 3 indicators and defining the color of each country same as its region above:
 ax[0][0].bar(BRICS_country_stats2.index,BRICS_country_stats2['Population in thousands (2017)'],color=['green','black','cyan','red','blue'])
 ax[0][1].bar(BRICS_country_stats2.index,BRICS_country_stats2['Population density (per km2, 2017)'],color=['green','black','cyan','red','blue'])
 ax[0][2].bar(BRICS_country_stats2.index,BRICS_country_stats2['GDP per capita (current US$)'],color=['green','black','cyan','red','blue'])
 
-# Labeling the x-axes ticks for each Regional subplots:
+# labeling the x-axes ticks for each Regional subplots:
 ax[1][0].set_xticklabels(regional_stats.index,rotation=25)
 ax[1][1].set_xticklabels(regional_stats.index,rotation=25)
 ax[1][2].set_xticklabels(regional_stats.index,rotation=25)
 
-# Labeling the x-axes ticks for each BRICS member subplots:
+# labeling the x-axes ticks for each BRICS member subplots:
 ax[0][0].set_xticklabels(BRICS_country_stats2.index,rotation=25)
 ax[0][1].set_xticklabels(BRICS_country_stats2.index,rotation=25)
 ax[0][2].set_xticklabels(BRICS_country_stats2.index,rotation=25)
 
-# Labeling the y-axes for each of the subplots (both regional & BRICS members):
+# labeling the y-axes for each of the subplots (both regional & BRICS members):
 ax[1][0].set_ylabel('Population in thousands (2017)')
 ax[0][0].set_ylabel('Population in thousands (2017)')
 ax[1][1].set_ylabel('Population density (per km2, 2017)')
@@ -91,7 +94,7 @@ ax[1][2].set_ylabel('GDP per capita (current US$)')
 ax[0][2].set_ylabel('GDP per capita (current US$)')
 
 
-# Add plot title for each subplot:
+# adding plot title for each subplot:
 ax[0][0].set_title("BRICS members' total population (2017)")
 ax[0][1].set_title("BRICS members' population density (2017)")
 ax[0][2].set_title("BRICS members' GDP per capita (2017)")
@@ -102,7 +105,7 @@ ax[1][2].set_title("Region-wise GDP per capita (2017)")
 
 # adjusting the spacing between subplots to minimize the overlaps:
 plt.tight_layout()
-
+# displaying the final plot:
 plt.show()
 
 

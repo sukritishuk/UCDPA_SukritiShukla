@@ -747,35 +747,35 @@ my_dict22.rename(columns={0:'Country_Code',1:'TradeF_Indicator'}, inplace=True)
 print(my_dict22)
 
 # merging all 3 indicator dataframes -
-Trade_Fin_dict = my_dict20.merge(my_dict21,on='Country_Code',how='outer',suffixes=('_Gross_fix_cap','_Pvt_cap_flow'))
-print(Trade_Fin_dict)
+Trade_Flows_dict = my_dict20.merge(my_dict21,on='Country_Code',how='outer',suffixes=('_Gross_fix_cap','_Pvt_cap_flow'))
+print(Trade_Flows_dict)
 
 # Renaming columns of merged DataFrame -
-Trade_Fin_dict2 = Trade_Fin_dict.merge(my_dict22,on='Country_Code',how='left')
-Trade_Fin_dict2.rename(columns={'TradeF_Indicator_Gross_fix_cap':'Gross fixed capital formation (% of GDP)','TradeF_Indicator_Pvt_cap_flow':'Private capital flows (% of GDP)',
+Trade_Flows_dict2 = Trade_Flows_dict.merge(my_dict22,on='Country_Code',how='left')
+Trade_Flows_dict2.rename(columns={'TradeF_Indicator_Gross_fix_cap':'Gross fixed capital formation (% of GDP)','TradeF_Indicator_Pvt_cap_flow':'Private capital flows (% of GDP)',
                             'TradeF_Indicator': 'Remittances, inflows (% of GDP)'}, inplace=True)
-print(Trade_Fin_dict2)
+print(Trade_Flows_dict2)
 
 # Missing data from API Query - Replacing Missing Value of China Gross fixed capital formation (% of GDP) data from NaN to actual value 42.8
 # Step 1 - Fill NaN with a string of nested dictionary value for China data i.e.{'65606': {'2019': 42.80}}
-Trade_Fin_dict2["Gross fixed capital formation (% of GDP)"].fillna("{'65606': {'2019': 42.80}}", inplace = True)
-print(Trade_Fin_dict2)
+Trade_Flows_dict2["Gross fixed capital formation (% of GDP)"].fillna("{'65606': {'2019': 42.80}}", inplace = True)
+print(Trade_Flows_dict2)
 
 # Step 2 - Used ast library to Convert a String representation of a Dictionary to a dictionary for China data:
 # using ast.literal_eval function:
-Trade_Fin_dict2['Gross fixed capital formation (% of GDP)'].fillna("{'65606': {'2019': 42.80}}", inplace = True)
-print(type(Trade_Fin_dict2['Gross fixed capital formation (% of GDP)'].loc[4][1]))
+Trade_Flows_dict2['Gross fixed capital formation (% of GDP)'].fillna("{'65606': {'2019': 42.80}}", inplace = True)
+print(type(Trade_Flows_dict2['Gross fixed capital formation (% of GDP)'].loc[4][1]))
 # using ast.literal_eval()
 import ast
 # initializing string
-Trade_Fin_dict2.loc[4][1] = ast.literal_eval(Trade_Fin_dict2.loc[4][1])
-print(type(Trade_Fin_dict2.loc[4][1]))
+Trade_Flows_dict2.loc[4][1] = ast.literal_eval(Trade_Flows_dict2.loc[4][1])
+print(type(Trade_Flows_dict2.loc[4][1]))
 
 # Creating a DataFrame for values data -
 values = []
 for i in range(0,5):
     for j in range(1,4):
-        data = Trade_Fin_dict2.loc[i][j].values()
+        data = Trade_Flows_dict2.loc[i][j].values()
         for item in data:
             ind_val = item.values()
             for s in ind_val:
@@ -787,7 +787,7 @@ print(df)
 year = []
 for i in range(0,5):
     for j in range(1,4):
-        data = Trade_Fin_dict2.loc[i][j].values()
+        data = Trade_Flows_dict2.loc[i][j].values()
         for item in data:
             ind_val2 = item.keys()
             for s in ind_val2:
@@ -799,43 +799,75 @@ print(df2)
 ## Data Cleaning of Gross fixed capital formation (% of GDP) column:
 for i in range(0,5):
     if i == 0:
-        Trade_Fin_dict2.iloc[i][1]=df.loc[0]
+        Trade_Flows_dict2.iloc[i][1]=df.loc[0]
     else:
         for k in range(i*3):
-            Trade_Fin_dict2.iloc[i][1]=df.loc[k+1]
+            Trade_Flows_dict2.iloc[i][1]=df.loc[k+1]
 ## Data Cleaning of Private capital flows (% of GDP) column:
 for i in range(0,5):
     if i == 0:
-        Trade_Fin_dict2.iloc[i][2]=df.loc[1]
+        Trade_Flows_dict2.iloc[i][2]=df.loc[1]
     else:
         for k in range(i*3+1):
-            Trade_Fin_dict2.iloc[i][2]=df.loc[k+1]
+            Trade_Flows_dict2.iloc[i][2]=df.loc[k+1]
 ## Data Cleaning of Remittances, inflows (% of GDP) column:
 for i in range(0,5):
     if i == 0:
-        Trade_Fin_dict2.iloc[i][3]=df.loc[2]
+        Trade_Flows_dict2.iloc[i][3]=df.loc[2]
     else:
         for k in range(i*3+2):
-            Trade_Fin_dict2.iloc[i][3]=df.loc[k+1]
+            Trade_Flows_dict2.iloc[i][3]=df.loc[k+1]
 # Adding year column by slicing df2:
 year = df2.loc[0:4]
-Trade_Fin_dict2['Year'] = year
-print(Trade_Fin_dict2)
+Trade_Flows_dict2['Year'] = year
+print(Trade_Flows_dict2)
 
 # Change Datatype for 3 values columns to float:
-Trade_Fin_dict2["Gross fixed capital formation (% of GDP)"] = Trade_Fin_dict2['Gross fixed capital formation (% of GDP)'].astype('float')
-Trade_Fin_dict2["Private capital flows (% of GDP)"] = Trade_Fin_dict2['Private capital flows (% of GDP)'].astype('float')
-Trade_Fin_dict2["Remittances, inflows (% of GDP)"] = Trade_Fin_dict2['Remittances, inflows (% of GDP)'].astype('float')
-print(Trade_Fin_dict2.dtypes)
+Trade_Flows_dict2["Gross fixed capital formation (% of GDP)"] = Trade_Flows_dict2['Gross fixed capital formation (% of GDP)'].astype('float')
+Trade_Flows_dict2["Private capital flows (% of GDP)"] = Trade_Flows_dict2['Private capital flows (% of GDP)'].astype('float')
+Trade_Flows_dict2["Remittances, inflows (% of GDP)"] = Trade_Flows_dict2['Remittances, inflows (% of GDP)'].astype('float')
+print(Trade_Flows_dict2.dtypes)
 
-print(Trade_Fin_dict2)
+print(Trade_Flows_dict2)
 
 
 # Merging both the Trade Finance DataFrames into one:
-Trade_Finance_merged = Trade_Fin_dict.merge(Trade_Fin_dict2, on=['Country_Code'],how='left')
+Trade_Finance_merged = Trade_Fin_dict.merge(Trade_Flows_dict2, on=['Country_Code'],how='left')
 Trade_Finance_merged.rename(columns={'TradeF_Indicator_Gross_fix_cap':'Exports and imports (% of GDP)','TradeF_Indicator_Pvt_cap_flow':'FDI, net inflows (% of GDP)'}, inplace=True)
 
 print(Trade_Finance_merged.dtypes)
+
+
+# Visualizing Data from Multiple DataFrames into one Chart:
+import matplotlib.pyplot as plt
+
+df = Trade_Finance_merged[['Country_Code', 'Exports and imports (% of GDP)', 'FDI, net inflows (% of GDP)',
+                           'Gross fixed capital formation (% of GDP)', 'Private capital flows (% of GDP)',
+                           'Remittances, inflows (% of GDP)']]
+
+df.set_index('Country_Code', inplace=True)
+
+label = ['Exports & Imports', 'FDI (net inflows)', 'Gross fixed capital formation', 'Private capital flows',
+         'Remittances (inflows)']
+
+# plot the DataFrame
+df.plot.bar(figsize=(12, 8))
+
+plt.title('Trade & Financial Flow Levels among BRICS Members in 2019', fontsize=14)
+plt.xticks(rotation=0)
+plt.yticks(fontsize=11)
+plt.ylabel('Share of GDP (%)', fontsize=13)
+plt.xlabel('BRICS member countries', fontsize=13)
+plt.legend(label, loc='upper left', title="Trade & Finance Flow Indicators", fontsize=12,framealpha=0.5)
+plt.ylim(-10, 65)
+
+# plotting a horizontal line at y=0:
+plt.axhline(y=0, color='r', linestyle='--')
+
+plt.show()
+
+
+
 
 
 ### Calculating Human Development Index (HDI) values for BRICS members -

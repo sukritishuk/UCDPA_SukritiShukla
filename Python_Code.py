@@ -135,25 +135,24 @@ for i, txt in enumerate(label):
 plt.show()
 
 
-## Chart 3 - Visualizing the contribution of different sectors to their economies (2017) for each BRICS member (as a Stacked Column Chart) -
-# Step 1 - Cleaning & Formatting the data before plotting the chart -
+## Chart 3 - Visualizing the contribution of different Sectors to each BRICS member economy (2017) as a Stacked Bar Chart -
+## Step 1 - Slicing, Cleaning & Formatting the data before plotting the chart -
 # slicing the csv file for relevant columns and importing them into Pandas DataFrame:
 BRICS_economy = BRICS_country_stats[['country','Region','Economy: Agriculture (% of GVA)','Economy: Industry (% of GVA)','Economy: Services and other activity (% of GVA)']]
-# setting country as the index for the sliced DataFrame:
+# setting country column as the index for the sliced DataFrame:
 BRICS_economy.set_index('country',inplace = True)
 # checking the data type for one value of Economy: Agriculture (% of GVA) column:
 BRICS_economy['Economy: Agriculture (% of GVA)']['South Africa']
-# printing each column datatype as it is:
+# printing each column data type as it is:
 print(BRICS_economy.dtypes)
-# changing the data type of 3 Indicator columns to float:
+# changing the data type of the 3 Indicator columns to float:
 BRICS_economy['Economy: Agriculture (% of GVA)'] = BRICS_economy['Economy: Agriculture (% of GVA)'].astype(float)
-# printing the datatypes for columns after the change:
+# printing the data types for columns after the change:
 print(BRICS_economy.dtypes)
 # printing the sliced DataFrame:
 print(BRICS_economy)
 
-
-# Step 2 - Plotting the Percent Stacked Column Chart -
+## Step 2 - Plotting the Percent Stacked Bar Chart -
 # creating a Figure and Axes objects and defining the figure size of the chart:
 fig,ax = plt.subplots(figsize=(10,6))
 # plotting the bar chart for all the Economy indicators stacked on top of each other for every BRICS member country:
@@ -167,67 +166,75 @@ ax.set_xticklabels(BRICS_economy.index,rotation=15)
 ax.set_ylabel('Share as % of GVA',fontsize=13)
 # adding a title to the stacked plot by splitting the title in 2 different lines:
 ax.set_title('BRICS Members: Sectoral Contributions to Economy in 2017 \n (as % of Gross Value Added (GVA))',fontsize=14)
-# adding the legend, defining its location & giving the egend a title:
+# adding the legend, defining its location & giving the legend a title:
 ax.legend(title="Sectors of Economy:",loc='upper right')
 
-# looping to add the text for each value on each column part:
+# looping to add the text for each value on each bar chart part:
+# Step 1 - creating a list of each indicator value to be displayed as text:
 list_values = (BRICS_economy['Economy: Agriculture (% of GVA)'].tolist()
                 + BRICS_economy['Economy: Industry (% of GVA)'].tolist()
                 + BRICS_economy['Economy: Services and other activity (% of GVA)'].tolist())
+# Step 2 - getting the height & width of each bar rectangle and add the text by aligning it to the center of the rectangle
+# both horizontally & vertically:
 for rect, value in zip(ax.patches, list_values):
     h = rect.get_height() /2.
     w = rect.get_width() /2.
     x, y = rect.get_xy()
     ax.text(x+w, y+h,value,horizontalalignment='center',verticalalignment='center')
+
 # finally displaying the plot:
 plt.show()
 
 
 
 
-# Slicing the csv file for relevant columns and importing them into Pandas DataFrame:
+## Chart 4 - Visualizing International Trade Indicators for BRICS members (2017) as a Horizontal Bar Plot-
+## Step 1 - Slicing, Cleaning & Formatting the data before plotting the chart -
+# slicing the csv file for relevant columns and importing them into Pandas DataFrame:
 BRICS_int_trade = BRICS_country_stats[['country','Region','International trade: Exports (million US$)','International trade: Imports (million US$)','International trade: Balance (million US$)','Balance of payments, current account (million US$)']]
-
-# Set index for DataFrame:
+# setting country column as the index for sliced DataFrame:
 BRICS_int_trade.set_index('country',inplace = True)
-
-# Rename column names to shorten them:
+# renaming the column names to shorten them:
 BRICS_int_trade.rename(columns={'International trade: Exports (million US$)':'Exports (million US$)','International trade: Imports (million US$)': 'Imports (million US$)',
                         'International trade: Balance (million US$)':'Bal of Trade (million US$)',
                                 'Balance of payments, current account (million US$)': 'Bal of Paymnt (Current) (million US$)'},inplace=True)
 
-# Checking the data type for each column of DataFrame:
+# checking the data type for each column of the sliced DataFrame:
 print(BRICS_int_trade.dtypes)
-
-
-# Changing the data type for value columns to float:
+# changing the data type for the 4 Indicator columns to float:
 BRICS_int_trade['Exports (million US$)'] = BRICS_int_trade['Exports (million US$)'].astype(float)
 BRICS_int_trade['Imports (million US$)'] = BRICS_int_trade['Imports (million US$)'].astype(float)
 BRICS_int_trade['Bal of Trade (million US$)'] = BRICS_int_trade['Bal of Trade (million US$)'].astype(float)
 BRICS_int_trade['Bal of Paymnt (Current) (million US$)'] = BRICS_int_trade['Bal of Paymnt (Current) (million US$)'].astype(float)
-
+# printing the data types for columns after the change:
 print(BRICS_int_trade.dtypes)
 
 
+## Step 2 - Plotting the Horizontal Bar Plot -
+# plotting the bar plot for each Trade Indicator:
 BRICS_int_trade[['Exports (million US$)','Imports (million US$)','Bal of Trade (million US$)','Bal of Paymnt (Current) (million US$)']].plot(kind='barh',figsize=(12,8))
-
+# adding a title to the chart:
 plt.title('Levels of International Trade Components among BRICS Members (2017)',fontsize=14)
+# adding x-axis & y-axis labels to the chart:
 plt.xlabel('Trade Components (in million US$)',fontsize=13)
 plt.ylabel('BRICS member countries',fontsize=13)
 
 # setting x-axis limit ranges:
 plt.xlim([-500000,2200000])
 
-# Show the grid lines as grey lines
+# configuring the grid lines on the face of plot (using the Matplotlib's grid function) and
+# customizing it with color & linestyle:
 plt.grid(b=True,color='grey',linestyle='--')
 
+# adding the legend, defining its location & giving the legend a title:
 plt.legend(['Exports','Imports','Balance of Trade','Balance of Payment (Current)'],
            loc='upper right',title='Trade Variables')
 
-# annotating Trade Deficit for India values:
+# annotating the plot with text "Trade Deficit" for India values:
 plt.annotate("Trade Deficit", xy=(-97000,2),horizontalalignment='right', verticalalignment='center',fontsize=12,
 xytext=(-2,1),arrowprops={'arrowstyle':"->","color":"black"})
 
+# displaying the plot finally:
 plt.show()
 
 

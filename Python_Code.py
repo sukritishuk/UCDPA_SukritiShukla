@@ -93,7 +93,6 @@ ax[0][1].set_ylabel('Population density (per km2, 2017)')
 ax[1][2].set_ylabel('GDP per capita (current US$)')
 ax[0][2].set_ylabel('GDP per capita (current US$)')
 
-
 # adding plot title for each subplot:
 ax[0][0].set_title("BRICS members' total population (2017)")
 ax[0][1].set_title("BRICS members' population density (2017)")
@@ -109,64 +108,69 @@ plt.tight_layout()
 plt.show()
 
 
+## Chart 2 - Scatter plot showing the Relation between GDP per capita, Total Population (2017) & Popualtion Density levels among BRICS members:
+# creating a Figure and Axes objects and defining the figure size of the chart:
 fig, ax = plt.subplots(figsize=(8, 6))
 
-# Scatter plot comparing Total population and GDP per capita with the size of each plot showing the Population density (per km2):
+# plotting the Scatter plot showing the Total population on x-axis and GDP per capita on the y-axis:
+# also showing the size of each point on the plot equal to 2-times the Population density (per km2) for that country:
 ax.scatter(x = BRICS_country_stats2['Population in thousands (2017)'], y = BRICS_country_stats2['GDP per capita (current US$)'],
            s = BRICS_country_stats2['Population density (per km2, 2017)']*2)
+
+# labeling the axes for the scatter plot:
 plt.xlabel("Total Population (in thousands 2017)",fontsize=13)
 plt.ylabel("GDP per capita (current US$)",fontsize=13)
+# adding the plot title:
 plt.title('GDP per capita vs. Total Population among BRICS Members (2017)',fontsize=14)
 
-# Show the grid lines as grey lines
+# configuring the grid lines on the face of plot (using the Matplotlib's grid function) as color grey:
 plt.grid(b=True,color='grey',linestyle='--')
 
-
-# Labelling each data point on scatter plot:
+# labelling each data point on the scatter plot to show the names of BRICS countries:
 label = ['Brazil','China','India','Russian Federation','South Africa']
 for i, txt in enumerate(label):
     ax.annotate(txt, (BRICS_country_stats2['Population in thousands (2017)'][i], BRICS_country_stats2['GDP per capita (current US$)'][i]),
                 size=12)
-
+# displaying the plot finally:
 plt.show()
 
 
-
-# Slicing the csv file for relevant columns and importing them into Pandas DataFrame:
+## Chart 3 - Visualizing the contribution of different sectors to their economies (2017) for each BRICS member (as a Stacked Column Chart) -
+# Step 1 - Cleaning & Formatting the data before plotting the chart -
+# slicing the csv file for relevant columns and importing them into Pandas DataFrame:
 BRICS_economy = BRICS_country_stats[['country','Region','Economy: Agriculture (% of GVA)','Economy: Industry (% of GVA)','Economy: Services and other activity (% of GVA)']]
-
-# Set index for DataFrame:
+# setting country as the index for the sliced DataFrame:
 BRICS_economy.set_index('country',inplace = True)
-
-# Changing the data type for Economy: Agriculture (% of GVA) column values from string to float:
+# checking the data type for one value of Economy: Agriculture (% of GVA) column:
 BRICS_economy['Economy: Agriculture (% of GVA)']['South Africa']
-
-# Datatype for Economy: Agriculture (% of GVA) column is object but should be float64 so as to plot charts:
+# printing each column datatype as it is:
 print(BRICS_economy.dtypes)
-# Changing the data type to float:
+# changing the data type of 3 Indicator columns to float:
 BRICS_economy['Economy: Agriculture (% of GVA)'] = BRICS_economy['Economy: Agriculture (% of GVA)'].astype(float)
+# printing the datatypes for columns after the change:
 print(BRICS_economy.dtypes)
-
+# printing the sliced DataFrame:
 print(BRICS_economy)
 
 
-# Plotting the Percent Stacked Column Chart:
+# Step 2 - Plotting the Percent Stacked Column Chart -
+# creating a Figure and Axes objects and defining the figure size of the chart:
 fig,ax = plt.subplots(figsize=(10,6))
-
+# plotting the bar chart for all the Economy indicators stacked on top of each other for every BRICS member country:
 ax.bar(BRICS_economy.index,BRICS_economy['Economy: Agriculture (% of GVA)'],label = 'Agriculture')
 ax.bar(BRICS_economy.index,BRICS_economy['Economy: Industry (% of GVA)'],bottom= BRICS_economy['Economy: Agriculture (% of GVA)'], label = 'Industry')
 ax.bar(BRICS_economy.index,BRICS_economy['Economy: Services and other activity (% of GVA)'], bottom=(BRICS_economy['Economy: Agriculture (% of GVA)'] + BRICS_economy['Economy: Industry (% of GVA)']),label = 'Services (& Other)')
 
-# adding the legend, title ans axes labels:
+# adding the tick labels for x-axis as country names and rotating them:
 ax.set_xticklabels(BRICS_economy.index,rotation=15)
+# adding the y-axis labels:
 ax.set_ylabel('Share as % of GVA',fontsize=13)
-
-# adding a title to stacked plot by splitting the title in 2 diferent lines:
+# adding a title to the stacked plot by splitting the title in 2 different lines:
 ax.set_title('BRICS Members: Sectoral Contributions to Economy in 2017 \n (as % of Gross Value Added (GVA))',fontsize=14)
-
+# adding the legend, defining its location & giving the egend a title:
 ax.legend(title="Sectors of Economy:",loc='upper right')
 
-# loop to add the text for values on each column:
+# looping to add the text for each value on each column part:
 list_values = (BRICS_economy['Economy: Agriculture (% of GVA)'].tolist()
                 + BRICS_economy['Economy: Industry (% of GVA)'].tolist()
                 + BRICS_economy['Economy: Services and other activity (% of GVA)'].tolist())
@@ -175,8 +179,10 @@ for rect, value in zip(ax.patches, list_values):
     w = rect.get_width() /2.
     x, y = rect.get_xy()
     ax.text(x+w, y+h,value,horizontalalignment='center',verticalalignment='center')
-
+# finally displaying the plot:
 plt.show()
+
+
 
 
 # Slicing the csv file for relevant columns and importing them into Pandas DataFrame:

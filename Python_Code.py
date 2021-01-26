@@ -589,7 +589,7 @@ print(Demographic_dict2)
 
 
 
-## Chart 2 - Visualizing Demographic Indicators across BRICS Members in 2019:
+## Chart 2 - Visualizing Demographic Indicators across BRICS Members in 2019 -
 # creating a Figure and Axes objects (2 rows and 1 column) and defining the figure size:
 fig,ax = plt.subplots(2,1,figsize=(10,8))
 # Making Subplot 1 - plotting the top plot as bar chart for Total population & Share of Urban Population in 2019:
@@ -762,7 +762,6 @@ Income_dict2.rename(columns={'Income_Indicator_per_cap_GNI':'Gross national inco
 # printing the Income DataFrame:
 print(Income_dict2)
 
-
 ## Step 3 - Creating a DataFrame for indicator values data -
 values = []
 for i in range(0,5):
@@ -775,7 +774,6 @@ for i in range(0,5):
                 df = pd.DataFrame(values)
 # printing the values DataFrame:
 print(df)
-
 
 ## Step 4 - Creating a DataFrame for year values data -
 year = []
@@ -833,41 +831,55 @@ print(Income_dict2.dtypes)
 print(Income_dict2)
 
 
-# Indicator 5 - Trade_Finance:
-# Indicator 1 - Gross fixed capital formation (% of GDP):
+## Step 1 - Querying the API, Retrieving the Data and Importing it into Pandas DataFrame -
+## Data for all 3 Trade & Financial Flows Indicators:-
+# Trade & Financial Flow Indicator 1 - Gross fixed capital formation (% of GDP) for 2019 (indicator_id : 65606):
+# packaging the request, sending it to retrieve BRICS members' data:
 response = requests.get('http://ec2-54-174-131-205.compute-1.amazonaws.com/API/HDRO_API.php/country_code=BRA,RUS,IND,CHN,ZAF/indicator_id=65606/year=2019/structure=ciy')
+# getting the API response in JSON format and assigning it to a variable:
 Gross_fix_cap = response.json()
+# importing the JSON response into Pandas DataFrame, iterating over its content and assigning it to another variable:
 my_dict20 = pd.DataFrame(Gross_fix_cap['indicator_value'].items())
+# renaming the columns extracted from the DataFrame:
 my_dict20.rename(columns={0:'Country_Code',1:'TradeF_Indicator'}, inplace=True)
-print(my_dict20)
 
-# Indicator 2 - Private capital flows (% of GDP):
+# Trade & Financial Flow Indicator 2 - Private capital flows (% of GDP) for 2019 (indicator_id : 11306):
+# packaging the request, sending it to retrieve BRICS members' data:
 response = requests.get('http://ec2-54-174-131-205.compute-1.amazonaws.com/API/HDRO_API.php/country_code=BRA,RUS,IND,CHN,ZAF/indicator_id=111306/year=2019/structure=ciy')
+# getting the API response in JSON format and assigning it to a variable:
 Pvt_cap_flow = response.json()
+# importing the JSON response into Pandas DataFrame, iterating over its content and assigning it to another variable:
 my_dict21 = pd.DataFrame(Pvt_cap_flow['indicator_value'].items())
+# renaming the columns extracted from the DataFrame:
 my_dict21.rename(columns={0:'Country_Code',1:'TradeF_Indicator'}, inplace=True)
-print(my_dict21)
 
-# Indicator 3 - Remittances, inflows (% of GDP):
+# Trade & Financial Flow Indicator 3 - Remittances, inflows (% of GDP) for 2019 (indicator_id : 52606):
+# packaging the request, sending it to retrieve BRICS members' data:
 response = requests.get('http://ec2-54-174-131-205.compute-1.amazonaws.com/API/HDRO_API.php/country_code=BRA,RUS,IND,CHN,ZAF/indicator_id=52606/year=2019/structure=ciy')
+# getting the API response in JSON format and assigning it to a variable:
 Remittance_inf = response.json()
+# importing the JSON response into Pandas DataFrame, iterating over its content and assigning it to another variable:
 my_dict22 = pd.DataFrame(Remittance_inf['indicator_value'].items())
+# renaming the columns extracted from the DataFrame:
 my_dict22.rename(columns={0:'Country_Code',1:'TradeF_Indicator'}, inplace=True)
-print(my_dict22)
 
-# merging all 3 indicator dataframes -
+
+## Step 2 - Combining all the Indicator DataFrame into one -
+# merging all 3 Trade & Financial Flow indicator DataFrames and assigning it to a variable:
 Trade_Flows_dict = my_dict20.merge(my_dict21,on='Country_Code',how='outer',suffixes=('_Gross_fix_cap','_Pvt_cap_flow'))
-print(Trade_Flows_dict)
-
-# Renaming columns of merged DataFrame -
 Trade_Flows_dict2 = Trade_Flows_dict.merge(my_dict22,on='Country_Code',how='left')
+
+# renaming the columns of merged Trade & Financial Flow DataFrame -
 Trade_Flows_dict2.rename(columns={'TradeF_Indicator_Gross_fix_cap':'Gross fixed capital formation (% of GDP)','TradeF_Indicator_Pvt_cap_flow':'Private capital flows (% of GDP)',
                             'TradeF_Indicator': 'Remittances, inflows (% of GDP)'}, inplace=True)
+# printing the Health DataFrame:
 print(Trade_Flows_dict2)
+
 
 # Missing data from API Query - Replacing Missing Value of China Gross fixed capital formation (% of GDP) data from NaN to actual value 42.8
 # Step 1 - Fill NaN with a string of nested dictionary value for China data i.e.{'65606': {'2019': 42.80}}
 Trade_Flows_dict2["Gross fixed capital formation (% of GDP)"].fillna("{'65606': {'2019': 42.80}}", inplace = True)
+# printing the DataFrame after filling NaN:
 print(Trade_Flows_dict2)
 
 # Step 2 - Used ast library to Convert a String representation of a Dictionary to a dictionary for China data:
@@ -876,11 +888,13 @@ Trade_Flows_dict2['Gross fixed capital formation (% of GDP)'].fillna("{'65606': 
 print(type(Trade_Flows_dict2['Gross fixed capital formation (% of GDP)'].loc[4][1]))
 # using ast.literal_eval()
 import ast
-# initializing string
+# initializing the string
 Trade_Flows_dict2.loc[4][1] = ast.literal_eval(Trade_Flows_dict2.loc[4][1])
+# printing the type of filled in data by slicing it from DataFrame:
 print(type(Trade_Flows_dict2.loc[4][1]))
 
-# Creating a DataFrame for values data -
+
+## Step 3 - Creating a DataFrame for indicator values data -
 values = []
 for i in range(0,5):
     for j in range(1,4):
@@ -890,9 +904,11 @@ for i in range(0,5):
             for s in ind_val:
                 values.append(s)
                 df = pd.DataFrame(values)
+# printing the values DataFrame:
 print(df)
 
-# Creating a DataFrame for year data -
+
+## Step 4 - Creating a DataFrame for year values data -
 year = []
 for i in range(0,5):
     for j in range(1,4):
@@ -902,77 +918,93 @@ for i in range(0,5):
             for s in ind_val2:
                 year.append(s)
                 df2 = pd.DataFrame(year)
+# printing the year DataFrame:
 print(df2)
 
 
-## Data Cleaning of Gross fixed capital formation (% of GDP) column:
+## Step 5 - Data Cleaning for each column of Combined Trade & Financial Flow DataFrame:
+# cleaning the Gross fixed capital formation (% of GDP) column:
 for i in range(0,5):
     if i == 0:
         Trade_Flows_dict2.iloc[i][1]=df.loc[0]
     else:
         for k in range(i*3):
             Trade_Flows_dict2.iloc[i][1]=df.loc[k+1]
-## Data Cleaning of Private capital flows (% of GDP) column:
+# cleaning the Private capital flows (% of GDP) column:
 for i in range(0,5):
     if i == 0:
         Trade_Flows_dict2.iloc[i][2]=df.loc[1]
     else:
         for k in range(i*3+1):
             Trade_Flows_dict2.iloc[i][2]=df.loc[k+1]
-## Data Cleaning of Remittances, inflows (% of GDP) column:
+# cleaning the Remittances, inflows (% of GDP) column:
 for i in range(0,5):
     if i == 0:
         Trade_Flows_dict2.iloc[i][3]=df.loc[2]
     else:
         for k in range(i*3+2):
             Trade_Flows_dict2.iloc[i][3]=df.loc[k+1]
-# Adding year column by slicing df2:
+# adding the year data to cleaned DataFrame by slicing df2:
 year = df2.loc[0:4]
+# renaming the year data column as 'Year':
 Trade_Flows_dict2['Year'] = year
+# printing the cleaned Health DataFrame:
 print(Trade_Flows_dict2)
 
-# Change Datatype for 3 values columns to float:
+
+## Step 6 - Data Formatting for each column of Combined Trade & Financial Flow DataFrame:
+# changing the Datatype for 3 Trade & Financial Flow indicator values columns to float:
 Trade_Flows_dict2["Gross fixed capital formation (% of GDP)"] = Trade_Flows_dict2['Gross fixed capital formation (% of GDP)'].astype('float')
 Trade_Flows_dict2["Private capital flows (% of GDP)"] = Trade_Flows_dict2['Private capital flows (% of GDP)'].astype('float')
 Trade_Flows_dict2["Remittances, inflows (% of GDP)"] = Trade_Flows_dict2['Remittances, inflows (% of GDP)'].astype('float')
+# rechecking the data type post change:
 print(Trade_Flows_dict2.dtypes)
 
+## Step 7 - Printing the cleaned & formatted Trade & Financial Flow DataFrame:
 print(Trade_Flows_dict2)
 
 
-# Merging both the Trade Finance DataFrames into one:
+## Step 8 - Merging the Trade Finance & Trade & Financial Flows DataFrames into one:
 Trade_Finance_merged = Trade_Fin_dict.merge(Trade_Flows_dict2, on=['Country_Code'],how='left')
+# renaming the columns of the merged Trade Finance DataFrame:
 Trade_Finance_merged.rename(columns={'TradeF_Indicator_Gross_fix_cap':'Exports and imports (% of GDP)','TradeF_Indicator_Pvt_cap_flow':'FDI, net inflows (% of GDP)'}, inplace=True)
-
+# checking the data type for merged DataFrame columns:
 print(Trade_Finance_merged.dtypes)
 
 
-# Visualizing Data from Multiple DataFrames into one Chart:
+## Chart 3 - Visualizing the Level of Trade & Financial Flows among BRICS Members in 2019 -
+# loading Matplotlib library (alias as plt):
 import matplotlib.pyplot as plt
-
+# slicing the merged Trade Finance DataFrame by indexing the column names:
 df = Trade_Finance_merged[['Country_Code', 'Exports and imports (% of GDP)', 'FDI, net inflows (% of GDP)',
                            'Gross fixed capital formation (% of GDP)', 'Private capital flows (% of GDP)',
                            'Remittances, inflows (% of GDP)']]
-
+# setting the Country_Code column in the merged DataFrame as the index:
 df.set_index('Country_Code', inplace=True)
-
+# defining the indicator column names as a list & assigning it to a variable labels:
 label = ['Exports & Imports', 'FDI (net inflows)', 'Gross fixed capital formation', 'Private capital flows',
          'Remittances (inflows)']
 
-# plot the DataFrame
+# plotting the merged DataFrame as a bar Chart:
 df.plot.bar(figsize=(12, 8))
-
+# adding the plot title:
 plt.title('Trade & Financial Flow Levels among BRICS Members in 2019', fontsize=14)
+
+# customizing the axes ticks:
 plt.xticks(rotation=0)
 plt.yticks(fontsize=11)
+
+# adding the axes labels and customizing them:
 plt.ylabel('Share of GDP (%)', fontsize=13)
 plt.xlabel('BRICS member countries', fontsize=13)
+
+# adding a legend to the plot and customizing it:
 plt.legend(label, loc='upper left', title="Trade & Finance Flow Indicators", fontsize=12,framealpha=0.5)
+# setting the y-axis limits of the plot:
 plt.ylim(-10, 65)
-
-# plotting a horizontal line at y=0:
+# plotting a horizontal line at y=0 inorder to highlight the zero-value x-axis:
 plt.axhline(y=0, color='r', linestyle='--')
-
+# displaying the final plot:
 plt.show()
 
 

@@ -285,8 +285,7 @@ my_dict5 = pd.DataFrame(Life_exp_birth_male['indicator_value'].items())
 # renaming the columns extracted from the DataFrame:
 my_dict5.rename(columns={0:'Country_Code',1:'Health_Indicator'}, inplace=True)
 
-
-## Step 2 - Combining all the Pandas DataFrame into one -
+## Step 2 - Combining all the Indicator DataFrames into one -
 # merging all 3 Health indicator DataFrames and assigning it to a variable:
 Health_dict = my_dict3.merge(my_dict4,on='Country_Code',how='outer',suffixes=('_lifexp','_lifexp_fem'))
 Health_dict2 = Health_dict.merge(my_dict5,on='Country_Code',how='left')
@@ -295,7 +294,6 @@ Health_dict2.rename(columns={'Health_Indicator_lifexp':'Life expectancy at birth
                             'Health_Indicator': 'Life expectancy at birth, Male'}, inplace=True)
 # printing the Health DataFrame:
 print(Health_dict2)
-
 
 ## Step 3 - Creating a DataFrame for indicator values data -
 values = []
@@ -310,7 +308,6 @@ for i in range(0,5):
 # printing the values DataFrame:
 print(df)
 
-
 ## Step 4 - Creating a DataFrame for year values data -
 year = []
 for i in range(0,5):
@@ -323,7 +320,6 @@ for i in range(0,5):
                 df2 = pd.DataFrame(year)
 # printing the year DataFrame:
 print(df2)
-
 
 ## Step 5 - Data Cleaning for each column of Combined Health DataFrame:
 # cleaning the Life expectancy at birth column:
@@ -354,7 +350,6 @@ Health_dict2['Year'] = year
 # printing the cleaned Health DataFrame:
 print(Health_dict2)
 
-
 ## Step 6 - Data Formatting for each column of Combined Health DataFrame:
 # changing the Datatype for 3 Health indicator values columns to float:
 Health_dict2["Life expectancy at birth"] = Health_dict2['Life expectancy at birth'].astype('float')
@@ -362,33 +357,42 @@ Health_dict2["Life expectancy at birth, Female"] = Health_dict2['Life expectancy
 Health_dict2["Life expectancy at birth, Male"] = Health_dict2['Life expectancy at birth, Male'].astype('float')
 # rechecking the data type post change:
 print(Health_dict2.dtypes)
-# finally printing the cleaned & formatted Health DataFrame:
+
+## Step 7 - Printing the cleaned & formatted Health DataFrame:
 print(Health_dict2)
 
 
-# Indicator 2 - Education:
-# Indicator 1 - Expected years of schooling (years)
+## Step 1 - Querying the API, Retrieving the Data and Importing it into Pandas DataFrame -
+## Data for all 2 Education Indicators:-
+# Education Indicator 1 - Expected years of schooling (years) for 2019 (indicator_id : 69706)
+# packaging the request, sending it to retrieve BRICS members' data:
 response = requests.get('http://ec2-54-174-131-205.compute-1.amazonaws.com/API/HDRO_API.php/country_code=BRA,RUS,IND,CHN,ZAF/indicator_id=69706/year=2019/structure=ciy')
+# getting the API response in JSON format and assigning it to a variable:
 Exp_yrs_schooling = response.json()
+# importing the JSON response into Pandas DataFrame, iterating over its content and assigning it to another variable:
 my_dict12 = pd.DataFrame(Exp_yrs_schooling['indicator_value'].items())
+# renaming the columns extracted from the DataFrame:
 my_dict12.rename(columns={0:'Country_Code',1:'Education_Indicator'}, inplace=True)
-print(my_dict12)
 
-# Indicator 2 - Mean years of schooling
+# Education Indicator 2 - Mean years of schooling (years) for 2019 (indicator_id : 103006)
+# packaging the request, sending it to retrieve BRICS members' data:
 response = requests.get('http://ec2-54-174-131-205.compute-1.amazonaws.com/API/HDRO_API.php/country_code=BRA,RUS,IND,CHN,ZAF/indicator_id=103006/year=2019/structure=ciy')
+# getting the API response in JSON format and assigning it to a variable:
 Mean_yrs_schooling = response.json()
+# importing the JSON response into Pandas DataFrame, iterating over its content and assigning it to another variable:
 my_dict13 = pd.DataFrame(Mean_yrs_schooling['indicator_value'].items())
+# renaming the columns extracted from the DataFrame:
 my_dict13.rename(columns={0:'Country_Code',1:'Education_Indicator'}, inplace=True)
-print(my_dict13)
 
-# merging all 2 indicator dataframes -
+## Step 2 - Combining all the Indicator DataFrames into one -
+# merging all 2 Education indicator Dataframes and assigning it to a variable:
 Educational_dict = my_dict12.merge(my_dict13,on='Country_Code',how='outer',suffixes=('_Exp_yrs_schooling','_Mean_yrs_schooling'))
-# Renaming columns of merged DataFrame -
+# renaming the columns of merged Education DataFrame:
 Educational_dict.rename(columns={'Education_Indicator_Exp_yrs_schooling':'Expected years of schooling (years)','Education_Indicator_Mean_yrs_schooling':'Mean years of schooling (years)'}, inplace=True)
+# printing the Education DataFrame:
 print(Educational_dict)
 
-
-# Creating a DataFrame for values data -
+## Step 3 - Creating a DataFrame for indicator values data -
 values = []
 for i in range(0,5):
     for j in range(1,3):
@@ -398,10 +402,10 @@ for i in range(0,5):
             for s in ind_val:
                 values.append(s)
                 df = pd.DataFrame(values)
+# printing the values DataFrame:
 print(df)
 
-
-# Creating a DataFrame for year data -
+## Step 4 - Creating a DataFrame for year values data -
 year = []
 for i in range(0,5):
     for j in range(1,3):
@@ -411,93 +415,112 @@ for i in range(0,5):
             for s in ind_val2:
                 year.append(s)
                 df2 = pd.DataFrame(year)
+# printing the year DataFrame:
 print(df2)
 
-
-## Data Cleaning of Expected years of schooling (years) column:
+## Step 5 - Data Cleaning for each column of Combined Education DataFrame:
+# cleaning the Expected years of schooling (years) column:
 for i in range(0,5):
     if i == 0:
         Educational_dict.iloc[i][1]=df.loc[0]
     else:
         for k in range(i*2):
             Educational_dict.iloc[i][1]=df.loc[k+1]
-## Data Cleaning of Mean years of schooling column:
+# cleaning the Mean years of schooling (years) column:
 for i in range(0,5):
     if i == 0:
         Educational_dict.iloc[i][2]=df.loc[1]
     else:
         for k in range(i*2+1):
             Educational_dict.iloc[i][2]=df.loc[k+1]
-# Adding year column by slicing df2:
+# adding the year data to cleaned DataFrame by slicing df2:
 year = df2.loc[0:4]
+# renaming the year data column as 'Year':
 Educational_dict['Year'] = year
+# printing the cleaned Education DataFrame:
 print(Educational_dict)
 
-# Change Datatype for 2 values columns to float:
+## Step 6 - Data Formatting for each column of Combined Education DataFrame:
+# changing the Datatype for 2 Education indicator values columns to float:
 Educational_dict["Expected years of schooling (years)"] = Educational_dict['Expected years of schooling (years)'].astype('float')
 Educational_dict["Mean years of schooling (years)"] = Educational_dict['Mean years of schooling (years)'].astype('float')
-
+# rechecking the data type post change:
 print(Educational_dict.dtypes)
+
+## Step 7 - Printing the cleaned & formatted Education DataFrame:
 print(Educational_dict)
 
-# Chart 1 - Visualizing Life Expectancy and Educational Schooling across BRICS Members in 2019
-## Visualizzing Data from Multiple DataFrames into one Chart:
-import matplotlib.pyplot as plt
 
+
+
+## Chart 1 - Visualizing Life Expectancy and Educational Schooling for BRICS Members in 2019 -
+# loading Matplotlib library (alias as plt):
+import matplotlib.pyplot as plt
+# slicing the Health & Education DataFrames for specific columns:
 df12 = Health_dict2[['Country_Code','Life expectancy at birth, Male','Life expectancy at birth, Female']]
 df13 = Educational_dict[['Country_Code','Expected years of schooling (years)','Mean years of schooling (years)']]
-
-# use concat to combine more than two DataFrames
+# combining sliced Health & Education DataFrames (using concat function) and assigning it to variable df:
 df = pd.concat([df12.set_index('Country_Code'), df13.set_index('Country_Code')], axis=1)
-
-# plot the DataFrame
-df.plot.bar(figsize=(10, 8))   # logy= True Use to do log scaling on y axis
-
+# plotting the combined df DataFrame as a bar chart:
+df.plot.bar(figsize=(10, 8))
+# adding a title to the plot:
 plt.title('Years of Life Expectancy and Schooling among BRICS Members (2019)',fontsize=14)
+# labeling the x-axes ticks on the plot:
 plt.xticks(rotation=0)
+# labeling the axes of the plot:
 plt.ylabel('Years',fontsize=13)
 plt.xlabel('BRICS member countries',fontsize=13)
+# adding a legend to the plot and formatting itd location, fontsize & transparency level:
 plt.legend(loc='upper right',fontsize=12,framealpha=0.5)
-
-# Show the grid lines as grey lines
+# showing the grid lines on the plot & formatting them:
 plt.grid(b=True,color='grey',linestyle='--')
-
+# displaying the final plot:
 plt.show()
 
 
-# Indicator 3 - Demography:
-# Indicator 1 - Total population (millions)
+## Step 1 - Querying the API, Retrieving the Data and Importing it into Pandas DataFrame -
+## Data for all 3 Demography Indicators:-
+# Demography Indicator 1 - Total population (millions) for 2019 (indicator_id : 44206)
+# packaging the request, sending it to retrieve BRICS members' data:
 response = requests.get('http://ec2-54-174-131-205.compute-1.amazonaws.com/API/HDRO_API.php/country_code=BRA,RUS,IND,CHN,ZAF/indicator_id=44206/year=2019/structure=ciy')
+# getting the API response in JSON format and assigning it to a variable:
 Total_pop = response.json()
+# importing the JSON response into Pandas DataFrame, iterating over its content and assigning it to another variable:
 my_dict6 = pd.DataFrame(Total_pop['indicator_value'].items())
+# renaming the columns extracted from the DataFrame:
 my_dict6.rename(columns={0:'Country_Code',1:'Demographic_Indicator'}, inplace=True)
-print(my_dict6)
 
-# Indicator 2 - Sex ratio at birth (male to female births)
+# Demography Indicator 2 - Sex ratio at birth (male to female births) for 2019 (indicator_id : 49006)
+# packaging the request, sending it to retrieve BRICS members' data:
 response = requests.get('http://ec2-54-174-131-205.compute-1.amazonaws.com/API/HDRO_API.php/country_code=BRA,RUS,IND,CHN,ZAF/indicator_id=49006/year=2019')
+# getting the API response in JSON format and assigning it to a variable:
 Sex_ratio = response.json()
+# importing the JSON response into Pandas DataFrame, iterating over its content and assigning it to another variable:
 my_dict7 = pd.DataFrame(Sex_ratio['indicator_value'].items())
+# # renaming the columns extracted from the DataFrame:
 my_dict7.rename(columns={0:'Country_Code',1:'Demographic_Indicator'}, inplace=True)
-print(my_dict7)
 
-# Indicator 3 - Urban population (%)
+# Demography Indicator 3 - Urban population (%) for 2019 (indicator_id : 45106)
+# packaging the request, sending it to retrieve BRICS members' data:
 response = requests.get('http://ec2-54-174-131-205.compute-1.amazonaws.com/API/HDRO_API.php/country_code=BRA,RUS,IND,CHN,ZAF/indicator_id=45106/year=2019')
+# getting the API response in JSON format and assigning it to a variable:
 Urban_pop = response.json()
+# importing the JSON response into Pandas DataFrame, iterating over its content and assigning it to another variable:
 my_dict8 = pd.DataFrame(Urban_pop['indicator_value'].items())
+# renaming the columns extracted from the DataFrame:
 my_dict8.rename(columns={0:'Country_Code',1:'Demographic_Indicator'}, inplace=True)
-print(my_dict8)
 
-# merging all 3 indicator dataframes -
+## Step 2 - Combining all the Indicator DataFrame into one -
+# merging all 3 Demography indicator DataFrames and assigning it to a variable:
 Demographic_dict = my_dict6.merge(my_dict7,on='Country_Code',how='outer',suffixes=('_tot_pop','_sex_ratio'))
-print(Demographic_dict)
-
-# Renaming columns of merged DataFrame -
 Demographic_dict2 = Demographic_dict.merge(my_dict8,on='Country_Code',how='left')
+# renaming the columns of merged Demography DataFrame:
 Demographic_dict2.rename(columns={'Demographic_Indicator_tot_pop':'Total population (millions)','Demographic_Indicator_sex_ratio':'Sex ratio at birth (M to F)',
                             'Demographic_Indicator': 'Urban population (%)'}, inplace=True)
+# printing the Health DataFrame:
 print(Demographic_dict2)
 
-# Creating a DataFrame for values data -
+## Step 3 - Creating a DataFrame for indicator values data -
 values = []
 for i in range(0,5):
     for j in range(1,4):
@@ -507,9 +530,10 @@ for i in range(0,5):
             for s in ind_val:
                 values.append(s)
                 df = pd.DataFrame(values)
+# printing the values DataFrame:
 print(df)
 
-# Creating a DataFrame for year data -
+## Step 4 - Creating a DataFrame for year values data -
 year = []
 for i in range(0,5):
     for j in range(1,4):
@@ -519,104 +543,121 @@ for i in range(0,5):
             for s in ind_val2:
                 year.append(s)
                 df2 = pd.DataFrame(year)
+# printing the year DataFrame:
 print(df2)
 
 
-## Data Cleaning of Total population (millions) column:
+## Step 5 - Data Cleaning for each column of Combined Demography DataFrame:
+# cleaning the Total population (millions) column:
 for i in range(0,5):
     if i == 0:
         Demographic_dict2.iloc[i][1]=df.loc[0]
     else:
         for k in range(i*3):
             Demographic_dict2.iloc[i][1]=df.loc[k+1]
-## Data Cleaning of Sex ratio at birth (M to F) column:
+# cleaning the Sex ratio at birth (M to F) column:
 for i in range(0,5):
     if i == 0:
         Demographic_dict2.iloc[i][2]=df.loc[1]
     else:
         for k in range(i*3+1):
             Demographic_dict2.iloc[i][2]=df.loc[k+1]
-## Data Cleaning of Urban population (%) column:
+# cleaning the Urban population (%) column:
 for i in range(0,5):
     if i == 0:
         Demographic_dict2.iloc[i][3]=df.loc[2]
     else:
         for k in range(i*3+2):
             Demographic_dict2.iloc[i][3]=df.loc[k+1]
-# Adding year column by slicing df2:
+# adding the year data to cleaned DataFrame by slicing df2:
 year = df2.loc[0:4]
+# renaming the year data column as 'Year':
 Demographic_dict2['Year'] = year
+# printing the cleaned Health DataFrame:
 print(Demographic_dict2)
 
-print(Demographic_dict2.dtypes)
-# Change Datatype for 3 values columns to float:
+## Step 6 - Data Formatting for each column of Combined Demography DataFrame:
+# changing the Datatype for 3 Demography indicator values columns to float:
 Demographic_dict2["Total population (millions)"] = Demographic_dict2['Total population (millions)'].astype('float')
 Demographic_dict2["Sex ratio at birth (M to F)"] = Demographic_dict2['Sex ratio at birth (M to F)'].astype('float')
 Demographic_dict2["Urban population (%)"] = Demographic_dict2['Urban population (%)'].astype('float')
-
+# rechecking the data type post change:
 print(Demographic_dict2.dtypes)
+
+## Step 7 - Printing the cleaned & formatted Demography DataFrame:
 print(Demographic_dict2)
 
-## Visualizing Data on Twin Axis in one Chart:
-# create figure and axis objects with subplots()
-fig,ax = plt.subplots(2,1,figsize=(10,8))
-# Making Subplot 1 -
-ax[0].bar(Demographic_dict2['Country_Code'], Demographic_dict2['Total population (millions)'], color="red",alpha = 0.5)
-# set x-axis label
-#ax[0].set_xlabel("BRICS Members",fontsize=12)
-# set y-axis label
-ax[0].set_ylabel("Population (millions)",color="red",fontsize=13)
-# twin object for two different y-axis on the sample plot
-ax2=ax[0].twinx()
-# make a plot with different y-axis using second axis object
-ax2.plot(Demographic_dict2['Country_Code'], Demographic_dict2["Urban population (%)"],color="blue",marker="o")
 
+
+## Chart 2 - Visualizing Demographic Indicators across BRICS Members in 2019:
+# creating a Figure and Axes objects (2 rows and 1 column) and defining the figure size:
+fig,ax = plt.subplots(2,1,figsize=(10,8))
+# Making Subplot 1 - plotting the top plot as bar chart for Total population & Share of Urban Population in 2019:
+# plotting the bar chart for Total population in 2019:
+ax[0].bar(Demographic_dict2['Country_Code'], Demographic_dict2['Total population (millions)'], color="red",alpha = 0.5)
+# setting the y-axis label and customizing it:
+ax[0].set_ylabel("Population (millions)",color="red",fontsize=13)
+# creating a twin object for two different y-axis on the first subplot:
+ax2 = ax[0].twinx()
+# making a line plot of Share of Urban Population with different y-axis using second axis object:
+ax2.plot(Demographic_dict2['Country_Code'], Demographic_dict2["Urban population (%)"],color="blue",marker="o")
+# setting the  label for twin y-axis and customizing it:
 ax2.set_ylabel("Urban population (%)",color="blue",fontsize=13)
 
-# Making Subplot 2 -
+# Making Subplot 2 - plotting the top plot as bar chart for Total population & Sex ratio at birth (M to F) in 2019:
+# plotting the bar chart for Total population in 2019:
 ax[1].bar(Demographic_dict2['Country_Code'], Demographic_dict2['Total population (millions)'], color="red",alpha = 0.5)
-# set x-axis label
+# setting the x-axis label:
 ax[1].set_xlabel("BRICS member countries ",fontsize=13)
-# set y-axis label
+# setting y-axis label and customizing it:
 ax[1].set_ylabel("Population (millions)",color="red",fontsize=13)
-# twin object for two different y-axis on the sample plot
+# creating a twin object for two different y-axis on the second subplot:
 ax2=ax[1].twinx()
-# make a plot with different y-axis using second axis object
+# making a line plot of Sex ratio at birth with different y-axis using second axis object:
 ax2.plot(Demographic_dict2['Country_Code'], Demographic_dict2["Sex ratio at birth (M to F)"],color="blue",marker="o")
-
+# setting the  label for twin y-axis and customizing it:
 ax2.set_ylabel("Sex ratio at birth (M to F)",color="blue",fontsize=13)
 
-
-# set chart title
+# setting the chart title for both the subplots:
 ax[0].set_title('Total Population vs. Share of Urban Population across BRICS Members (2019)',fontsize=14)
 ax[1].set_title('Total Population vs. Male to Female Sex Ratio across BRICS Members (2019)',fontsize=14)
-
+# displaying the final plot:
 plt.show()
 
 
-# Indicator 3 - Trade and Financial Flows:
-# Indicator 1 - Exports and imports (% of GDP)
+## Step 1 - Querying the API, Retrieving the Data and Importing it into Pandas DataFrame -
+## Data for all 2 Trade & Finance Indicators:-
+# Trade Finance Indicator 1 - Exports and imports (% of GDP) for 2019 (indicator_id : 133206)
+# packaging the request, sending it to retrieve BRICS members' data:
 response = requests.get('http://ec2-54-174-131-205.compute-1.amazonaws.com/API/HDRO_API.php/country_code=BRA,RUS,IND,CHN,ZAF/indicator_id=133206/year=2019/structure=ciy')
+# getting the API response in JSON format and assigning it to a variable:
 Exports_and_Imports = response.json()
+# importing the JSON response into Pandas DataFrame, iterating over its content and assigning it to another variable:
 my_dict14 = pd.DataFrame(Exports_and_Imports['indicator_value'].items())
+# renaming the columns extracted from the DataFrame:
 my_dict14.rename(columns={0:'Country_Code',1:'Trade_Indicator'}, inplace=True)
-print(my_dict14)
 
-# Indicator 2 - Foreign direct investment, net inflows (% of GDP)
+# Trade Finance Indicator 2 - Foreign direct investment, net inflows (% of GDP) for 2019 (indicator_id : 53506)
+# packaging the request, sending it to retrieve BRICS members' data:
 response = requests.get('http://ec2-54-174-131-205.compute-1.amazonaws.com/API/HDRO_API.php/country_code=BRA,RUS,IND,CHN,ZAF/indicator_id=53506/year=2019/structure=ciy')
+# getting the API response in JSON format and assigning it to a variable:
 FDI_Net_Inflows = response.json()
+# importing the JSON response into Pandas DataFrame, iterating over its content and assigning it to another variable:
 my_dict15 = pd.DataFrame(FDI_Net_Inflows['indicator_value'].items())
+# renaming the columns extracted from the DataFrame:
 my_dict15.rename(columns={0:'Country_Code',1:'Trade_Indicator'}, inplace=True)
-print(my_dict15)
 
-# merging all 2 indicator dataframes -
+
+## Step 2 - Combining all the Indicator DataFrame into one -
+# merging all 3 Trade Finance indicator DataFrames and assigning it to a variable:
 Trade_Fin_dict = my_dict14.merge(my_dict15,on='Country_Code',how='outer',suffixes=('_Exports_and_Imports','_FDI_Net_Inflows'))
-# Renaming columns of merged DataFrame -
+# renaming the columns of merged Trade Finance DataFrame -
 Trade_Fin_dict.rename(columns={'Trade_Indicator_Exports_and_Imports':'Exports and imports (% of GDP)','Trade_Indicator_FDI_Net_Inflows':'FDI, net inflows (% of GDP)'}, inplace=True)
+# printing the Trade Finance DataFrame:
 print(Trade_Fin_dict)
 
 
-# Creating a DataFrame for values data -
+## Step 3 - Creating a DataFrame for indicator values data -
 values = []
 for i in range(0,5):
     for j in range(1,3):
@@ -626,10 +667,11 @@ for i in range(0,5):
             for s in ind_val:
                 values.append(s)
                 df = pd.DataFrame(values)
+# printing the values DataFrame:
 print(df)
 
 
-# Creating a DataFrame for year data -
+## Step 4 - Creating a DataFrame for year values data -
 year = []
 for i in range(0,5):
     for j in range(1,3):
@@ -639,69 +681,89 @@ for i in range(0,5):
             for s in ind_val2:
                 year.append(s)
                 df2 = pd.DataFrame(year)
+# printing the year DataFrame:
 print(df2)
 
 
-## Data Cleaning of Exports and imports (% of GDP) column:
+## Step 5 - Data Cleaning for each column of Combined Trade Finance DataFrame:
+# cleaning the Exports and imports (% of GDP) column:
 for i in range(0,5):
     if i == 0:
         Trade_Fin_dict.iloc[i][1]=df.loc[0]
     else:
         for k in range(i*2):
             Trade_Fin_dict.iloc[i][1]=df.loc[k+1]
-## Data Cleaning of Foreign direct investment, net inflows (% of GDP) column:
+# cleaning the Foreign direct investment, net inflows (% of GDP) column:
 for i in range(0,5):
     if i == 0:
         Trade_Fin_dict.iloc[i][2]=df.loc[1]
     else:
         for k in range(i*2+1):
             Trade_Fin_dict.iloc[i][2]=df.loc[k+1]
-# Adding year column by slicing df2:
+# adding the year data to cleaned DataFrame by slicing df2:
 year = df2.loc[0:4]
+# renaming the year data column as 'Year':
 Trade_Fin_dict['Year'] = year
+# printing the cleaned Health DataFrame:
 print(Trade_Fin_dict)
 
-# Change Datatype for 2 values columns to float:
+## Step 6 - Data Formatting for each column of Combined Trade Finance DataFrame:
+# changing the Datatype for 2 Trade Finance indicator values columns to float:
 Trade_Fin_dict["Exports and imports (% of GDP)"] = Trade_Fin_dict['Exports and imports (% of GDP)'].astype('float')
 Trade_Fin_dict["FDI, net inflows (% of GDP)"] = Trade_Fin_dict['FDI, net inflows (% of GDP)'].astype('float')
-
+# rechecking the data type post change:
 print(Trade_Fin_dict.dtypes)
+
+## Step 7 - Printing the cleaned & formatted Trade Finance DataFrame:
 print(Trade_Fin_dict)
 
 
-# Indicator 4 - Income:
-# Indicator 1 - Gross national income (GNI) per capita
+## Step 1 - Querying the API, Retrieving the Data and Importing it into Pandas DataFrame -
+## Data for all 3 Income Indicators:-
+# Income Indicator 1 - Gross national income (GNI) per capita for 2019 (indicator_id : 195706)
+# packaging the request, sending it to retrieve BRICS members' data:
 response = requests.get('http://ec2-54-174-131-205.compute-1.amazonaws.com/API/HDRO_API.php/country_code=BRA,RUS,IND,CHN,ZAF/indicator_id=195706/year=2019/structure=ciy')
+# getting the API response in JSON format and assigning it to a variable:
 per_cap_GNI = response.json()
+# importing the JSON response into Pandas DataFrame, iterating over its content and assigning it to another variable:
 my_dict9 = pd.DataFrame(per_cap_GNI['indicator_value'].items())
+# renaming the columns extracted from the DataFrame:
 my_dict9.rename(columns={0:'Country_Code',1:'Income_Indicator'}, inplace=True)
-print(my_dict9)
 
-# Indicator 2 - Gross Domestic Product (GDP) per capita
+# Income Indicator 2 - Gross Domestic Product (GDP) per capita for 2019 (indicator_id : 194906)
+# packaging the request, sending it to retrieve BRICS members' data:
 response = requests.get('http://ec2-54-174-131-205.compute-1.amazonaws.com/API/HDRO_API.php/country_code=BRA,RUS,IND,CHN,ZAF/indicator_id=194906/year=2019/structure=ciy')
+# getting the API response in JSON format and assigning it to a variable:
 per_cap_GDP = response.json()
+# importing the JSON response into Pandas DataFrame, iterating over its content and assigning it to another variable:
 my_dict10 = pd.DataFrame(per_cap_GDP['indicator_value'].items())
+# renaming the columns extracted from the DataFrame:
 my_dict10.rename(columns={0:'Country_Code',1:'Income_Indicator'}, inplace=True)
-print(my_dict10)
 
-# Indicator 3 - Total Unemployment (% of labour force)
+# Income Indicator 3 - Total Unemployment (% of labour force) for 2019 (indicator_id : 140606)
+# packaging the request, sending it to retrieve BRICS members' data:
 response = requests.get('http://ec2-54-174-131-205.compute-1.amazonaws.com/API/HDRO_API.php/country_code=BRA,RUS,IND,CHN,ZAF/indicator_id=140606/year=2019/structure=ciy')
+# getting the API response in JSON format and assigning it to a variable:
 Tot_Unemp = response.json()
+# importing the JSON response into Pandas DataFrame, iterating over its content and assigning it to another variable:
 my_dict11 = pd.DataFrame(Tot_Unemp['indicator_value'].items())
+# renaming the columns extracted from the DataFrame:
 my_dict11.rename(columns={0:'Country_Code',1:'Income_Indicator'}, inplace=True)
-print(my_dict11)
 
-# merging all 3 indicator dataframes -
+
+## Step 2 - Combining all the Indicator DataFrame into one -
+# merging all 3 Income indicator DataFrames and assigning it to a variable:
 Income_dict = my_dict9.merge(my_dict10,on='Country_Code',how='outer',suffixes=('_per_cap_GNI','_per_cap_GDP'))
-print(Income_dict)
-
-# Renaming columns of merged DataFrame -
 Income_dict2 = Income_dict.merge(my_dict11,on='Country_Code',how='left')
+
+# renaming the columns of merged Income DataFrame -
 Income_dict2.rename(columns={'Income_Indicator_per_cap_GNI':'Gross national income (GNI) per capita','Income_Indicator_per_cap_GDP':'Gross Domestic Product (GDP) per capita',
                             'Income_Indicator': 'Total Unemployment (% of labour force)'}, inplace=True)
+# printing the Income DataFrame:
 print(Income_dict2)
 
-# Creating a DataFrame for values data -
+
+## Step 3 - Creating a DataFrame for indicator values data -
 values = []
 for i in range(0,5):
     for j in range(1,4):
@@ -711,9 +773,11 @@ for i in range(0,5):
             for s in ind_val:
                 values.append(s)
                 df = pd.DataFrame(values)
+# printing the values DataFrame:
 print(df)
 
-# Creating a DataFrame for year data -
+
+## Step 4 - Creating a DataFrame for year values data -
 year = []
 for i in range(0,5):
     for j in range(1,4):
@@ -723,42 +787,49 @@ for i in range(0,5):
             for s in ind_val2:
                 year.append(s)
                 df2 = pd.DataFrame(year)
+# printing the year DataFrame:
 print(df2)
 
 
-## Data Cleaning of Gross national income (GNI) per capita column:
+## Step 5 - Data Cleaning for each column of Combined Income DataFrame:
+# cleaning the Gross national income (GNI) per capita column:
 for i in range(0,5):
     if i == 0:
         Income_dict2.iloc[i][1]=df.loc[0]
     else:
         for k in range(i*3):
             Income_dict2.iloc[i][1]=df.loc[k+1]
-## Data Cleaning of GDP per capita column:
+# cleaning the GDP per capita column:
 for i in range(0,5):
     if i == 0:
         Income_dict2.iloc[i][2]=df.loc[1]
     else:
         for k in range(i*3+1):
             Income_dict2.iloc[i][2]=df.loc[k+1]
-## Data Cleaning of Total Unemployment (% of labour force) column:
+# cleaning the Total Unemployment (% of labour force) column:
 for i in range(0,5):
     if i == 0:
         Income_dict2.iloc[i][3]=df.loc[2]
     else:
         for k in range(i*3+2):
             Income_dict2.iloc[i][3]=df.loc[k+1]
-# Adding year column by slicing df2:
+# adding the year data to cleaned DataFrame by slicing df2:
 year = df2.loc[0:4]
+# renaming the year data column as 'Year':
 Income_dict2['Year'] = year
+# printing the cleaned Health DataFrame:
 print(Income_dict2)
 
-# Change Datatype for 3 values columns to float:
+
+## Step 6 - Data Formatting for each column of Combined Income DataFrame:
+# changing the Datatype for 3 Income indicator values columns to float:
 Income_dict2["Gross national income (GNI) per capita"] = Income_dict2['Gross national income (GNI) per capita'].astype('float')
 Income_dict2["Gross Domestic Product (GDP) per capita"] = Income_dict2['Gross Domestic Product (GDP) per capita'].astype('float')
 Income_dict2["Total Unemployment (% of labour force) "] = Income_dict2['Total Unemployment (% of labour force)'].astype('float')
-
+# rechecking the data type post change:
 print(Income_dict2.dtypes)
 
+## Step 7 - Printing the cleaned & formatted Income DataFrame:
 print(Income_dict2)
 
 

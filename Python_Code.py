@@ -1,5 +1,5 @@
 
-### Data Source 1 - Data from Kaggle Public Dataset - Country Statistics – UNData:
+### Data Source 1 - Data from Kaggle Public Dataset: Country Statistics – UNData:
 
 ## Step 1 - Importing csv File into Pandas DataFrame and understanding the data therein -
 # loading Pandas library (alias pd):
@@ -241,42 +241,63 @@ plt.show()
 
 
 
-## Data Source 2 - Data from HDI API:
+### Data Source 2 - Data from Human Development Data Center - Using HDRO Statistical Data API -
 
+# importing the request library to make the HTTP request:
 import requests
+# packaging the request, sending it & catching the response for HDR webpage url:
 response = requests.get('http://hdr.undp.org/en/countries')
+# printing the response and the response status code:
 print(response)
 
+
+## Step 1 - Querying the API, Retrieving the Data and Importing it into Pandas DataFrame -
+## Data for all 3 Health Indicators:-
+# Health Indicator 1 - Life expectancy at birth (years) for 2019 (indicator_id : 69206)
+# importing the Pandas library (alias pd):
 import pandas as pd
-# Indicator 1 - Life expectancy at birth (years)
+# packaging the request, sending it to retrieve BRICS members' data:
 response = requests.get('http://ec2-54-174-131-205.compute-1.amazonaws.com/API/HDRO_API.php/country_code=BRA,RUS,IND,CHN,ZAF/indicator_id=69206/year=2019/structure=ciy')
+# getting the API response in JSON format and assigning it to a variable:
 Life_exp_birth = response.json()
+# importing the JSON response into Pandas DataFrame, iterating over its content and assigning it to another variable:
 my_dict3 = pd.DataFrame(Life_exp_birth['indicator_value'].items())
+# renaming the columns extracted from the DataFrame:
 my_dict3.rename(columns={0:'Country_Code',1:'Health_Indicator'}, inplace=True)
-# Indicator 2 - Life expectancy at birth, female (years)
+
+# Health Indicator 2 - Life expectancy at birth, female (years) for 2019 (indicator_id : 120606)
+# packaging the request, sending it to retrieve BRICS members' data:
 response = requests.get('http://ec2-54-174-131-205.compute-1.amazonaws.com/API/HDRO_API.php/country_code=BRA,RUS,IND,CHN,ZAF/indicator_id=120606/year=2019')
+# getting the API response in JSON format and assigning it to a variable:
 Life_exp_birth_female = response.json()
+# importing the JSON response into Pandas DataFrame, iterating over its content and assigning it to another variable:
 my_dict4 = pd.DataFrame(Life_exp_birth_female['indicator_value'].items())
+# renaming the columns extracted from the DataFrame:
 my_dict4.rename(columns={0:'Country_Code',1:'Health_Indicator'}, inplace=True)
-# Indicator 3 - Life expectancy at birth, male (years)
+
+# Health Indicator 3 - Life expectancy at birth, male (years) for 2019 (indicator_id : 121106)
+# packaging the request, sending it to retrieve BRICS members' data:
 response = requests.get('http://ec2-54-174-131-205.compute-1.amazonaws.com/API/HDRO_API.php/country_code=BRA,RUS,IND,CHN,ZAF/indicator_id=121106/year=2019/structure=ciy')
+# getting the API response in JSON format and assigning it to a variable:
 Life_exp_birth_male = response.json()
+# importing the JSON response into Pandas DataFrame, iterating over its content and assigning it to another variable:
 my_dict5 = pd.DataFrame(Life_exp_birth_male['indicator_value'].items())
+# renaming the columns extracted from the DataFrame:
 my_dict5.rename(columns={0:'Country_Code',1:'Health_Indicator'}, inplace=True)
 
 
-# merging all 3 indicator dataframes -
+## Step 2 - Combining all the Pandas DataFrame into one -
+# merging all 3 Health indicator DataFrames and assigning it to a variable:
 Health_dict = my_dict3.merge(my_dict4,on='Country_Code',how='outer',suffixes=('_lifexp','_lifexp_fem'))
-print(Health_dict)
-
-# Renaming columns of merged DataFrame -
 Health_dict2 = Health_dict.merge(my_dict5,on='Country_Code',how='left')
+# renaming the columns of merged Health DataFrame -
 Health_dict2.rename(columns={'Health_Indicator_lifexp':'Life expectancy at birth','Health_Indicator_lifexp_fem':'Life expectancy at birth, Female',
                             'Health_Indicator': 'Life expectancy at birth, Male'}, inplace=True)
+# printing the Health DataFrame:
 print(Health_dict2)
 
 
-# Creating a DataFrame for values data -
+## Step 3 - Creating a DataFrame for indicator values data -
 values = []
 for i in range(0,5):
     for j in range(1,4):
@@ -286,10 +307,11 @@ for i in range(0,5):
             for s in ind_val:
                 values.append(s)
                 df = pd.DataFrame(values)
+# printing the values DataFrame:
 print(df)
 
 
-# Creating a DataFrame for year data -
+## Step 4 - Creating a DataFrame for year values data -
 year = []
 for i in range(0,5):
     for j in range(1,4):
@@ -299,48 +321,48 @@ for i in range(0,5):
             for s in ind_val2:
                 year.append(s)
                 df2 = pd.DataFrame(year)
+# printing the year DataFrame:
 print(df2)
 
 
-## Data Cleaning of Life expectancy at birth column:
+## Step 5 - Data Cleaning for each column of Combined Health DataFrame:
+# cleaning the Life expectancy at birth column:
 for i in range(0,5):
     if i == 0:
         Health_dict2.iloc[i][1]=df.loc[0]
     else:
         for k in range(i*3):
             Health_dict2.iloc[i][1]=df.loc[k+1]
-print(Health_dict2)
-
-## Data Cleaning of Life expectancy at birth, Female column:
+# cleaning the Life expectancy at birth, Female column:
 for i in range(0,5):
     if i == 0:
         Health_dict2.iloc[i][2]=df.loc[1]
     else:
         for k in range(i*3+1):
             Health_dict2.iloc[i][2]=df.loc[k+1]
-print(Health_dict2)
-
-## Data Cleaning of Life expectancy at birth, Male column:
+# cleaning the Life expectancy at birth, Male column:
 for i in range(0,5):
     if i == 0:
         Health_dict2.iloc[i][3]=df.loc[2]
     else:
         for k in range(i*3+2):
             Health_dict2.iloc[i][3]=df.loc[k+1]
-print(Health_dict2)
-
-# Adding year column by slicing df2:
+# adding the year data to cleaned DataFrame by slicing df2:
 year = df2.loc[0:4]
+# renaming the year data column as 'Year':
 Health_dict2['Year'] = year
+# printing the cleaned Health DataFrame:
 print(Health_dict2)
 
 
-# Change Datatype for 3 values columns to float:
+## Step 6 - Data Formatting for each column of Combined Health DataFrame:
+# changing the Datatype for 3 Health indicator values columns to float:
 Health_dict2["Life expectancy at birth"] = Health_dict2['Life expectancy at birth'].astype('float')
 Health_dict2["Life expectancy at birth, Female"] = Health_dict2['Life expectancy at birth, Female'].astype('float')
 Health_dict2["Life expectancy at birth, Male"] = Health_dict2['Life expectancy at birth, Male'].astype('float')
+# rechecking the data type post change:
 print(Health_dict2.dtypes)
-
+# finally printing the cleaned & formatted Health DataFrame:
 print(Health_dict2)
 
 
@@ -535,7 +557,7 @@ Demographic_dict2["Urban population (%)"] = Demographic_dict2['Urban population 
 print(Demographic_dict2.dtypes)
 print(Demographic_dict2)
 
-## Visualizzing Data on Twin Axis in one Chart:
+## Visualizing Data on Twin Axis in one Chart:
 # create figure and axis objects with subplots()
 fig,ax = plt.subplots(2,1,figsize=(10,8))
 # Making Subplot 1 -

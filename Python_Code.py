@@ -1139,30 +1139,28 @@ BRICS_HDI_values['HDI Value'] = BRICS_HDI_2019
 print(BRICS_HDI_values)
 
 
-## Step 4 - Calculating HDI Values using its Components
-# Merging DataFrames to create a DataFrame of HDI values & its Components for BRICS members:
-# Step 1 - merging Health Indicator to BRICS_HDI_values DataFrame:
+
+
+## Chart 1 - Visualizing HDI Values and its Dimension Components -
+##  Step 1 - Merging each Component's DataFrame to create a Combined DataFrame:
+# merging Health Indicator to BRICS_HDI_values DataFrame:
 HDI_and_Components = pd.merge(BRICS_HDI_values,Health_dict2[['Country_Code','Life expectancy at birth']],
                               on='Country_Code',how='left')
-
-# Step 2 - merging Education Indicators to BRICS_HDI_values DataFrame:
+# merging Education Indicators to BRICS_HDI_values DataFrame:
 HDI_and_Components2 = pd.merge(HDI_and_Components,Educational_dict[['Country_Code','Expected years of schooling (years)','Mean years of schooling (years)']],
                               on='Country_Code',how='left')
-
-# Step 3 - merging Income Indicator to BRICS_HDI_values DataFrame:
+# merging Income Indicator to BRICS_HDI_values DataFrame:
 BRICS_HDI_and_Components = pd.merge(HDI_and_Components2,Income_dict2[['Country_Code','Gross national income (GNI) per capita']],
                               on='Country_Code',how='left')
-
+# printing the merged DataFrame:
 print(BRICS_HDI_and_Components)
-
-# Sort Pandas DataFrame in descending order of HDI Values:
+# sorting the Pandas DataFrame in descending order of HDI Values & printing the DataFrame:
 BRICS_HDI_and_Components2 = BRICS_HDI_and_Components.sort_values(by=['HDI Value'],ascending=False)
 print(BRICS_HDI_and_Components2)
 
 
-# Normalizing some columns of Dataframe to better visualize them and draw insights:
-# Normalizing just a GNI per capitacolumn: normalizing GNI per capita in the range 0 to 1:
-# rename the normalized value column of GNI per capita to GNI per capita_norm:
+## Step 2 - Normalizing BRICS HDI Components Dataframe using Min-Max Normalization:
+# normalizing the GNI per capita column in the range 0 and 1 & renaming the calculated column as GNI per capita norm:
 BRICS_HDI_and_Components["GNI per capita norm"] = ((BRICS_HDI_and_Components["Gross national income (GNI) per capita"] -
                                                     BRICS_HDI_and_Components[
                                                         "Gross national income (GNI) per capita"].min()) /
@@ -1171,6 +1169,7 @@ BRICS_HDI_and_Components["GNI per capita norm"] = ((BRICS_HDI_and_Components["Gr
                                                     BRICS_HDI_and_Components[
                                                         "Gross national income (GNI) per capita"].min())) * 1
 
+# normalizing the Life expectancy at birth column in the range 0 and 1 & renaming the calculated column as Life expectancy at birth norm:
 BRICS_HDI_and_Components["Life expectancy at birth norm"] = ((BRICS_HDI_and_Components["Life expectancy at birth"] -
                                                               BRICS_HDI_and_Components[
                                                                   "Life expectancy at birth"].min()) /
@@ -1179,6 +1178,7 @@ BRICS_HDI_and_Components["Life expectancy at birth norm"] = ((BRICS_HDI_and_Comp
                                                               BRICS_HDI_and_Components[
                                                                   "Life expectancy at birth"].min())) * 1
 
+# normalizing the Expected years of schooling column in the range 0 and 1 & renaming the calculated column as Expected years of schooling norm:
 BRICS_HDI_and_Components["Expected years of schooling norm"] = ((BRICS_HDI_and_Components[
                                                                      "Expected years of schooling (years)"] -
                                                                  BRICS_HDI_and_Components[
@@ -1188,6 +1188,7 @@ BRICS_HDI_and_Components["Expected years of schooling norm"] = ((BRICS_HDI_and_C
                                                                  BRICS_HDI_and_Components[
                                                                      "Expected years of schooling (years)"].min())) * 1
 
+# normalizing the Mean years of schooling column in the range 0 and 1 & renaming the calculated column as Mean years of schooling norm:
 BRICS_HDI_and_Components["Mean years of schooling norm"] = ((BRICS_HDI_and_Components[
                                                                  "Mean years of schooling (years)"] -
                                                              BRICS_HDI_and_Components[
@@ -1197,33 +1198,35 @@ BRICS_HDI_and_Components["Mean years of schooling norm"] = ((BRICS_HDI_and_Compo
                                                              BRICS_HDI_and_Components[
                                                                  "Mean years of schooling (years)"].min())) * 1
 
+# dropping all other value columns from the BRICS HDI Component DataFrame:
 BRICS_HDI_and_Components_norm = BRICS_HDI_and_Components.drop(
     ['Life expectancy at birth', 'Expected years of schooling (years)',
      'Mean years of schooling (years)', 'Gross national income (GNI) per capita'], axis=1)
 
-# displaying all columns of the Dataframe:
+# finally displaying all columns of the Dataframe:
 print(BRICS_HDI_and_Components_norm)
 
 
-## Plotting the chart for HDI values & all its Components for various BRICS members:
-
+##  Step 3 - Plotting the HDI values & all its Components for various BRICS members:
 # plotting HDI values of each member as a line plot in red:
 ax = BRICS_HDI_and_Components_norm[['Country_Code', 'HDI Value']].plot(x='Country_Code', linestyle='-', marker='o',color='black',)
 
-# plotting Normalized values of HDI Components as a bar plots:
+# plotting Normalized values of HDI Components as Bar plots:
 BRICS_HDI_and_Components_norm[['Country_Code', 'GNI per capita norm','Life expectancy at birth norm',
                          'Expected years of schooling norm','Mean years of schooling norm']].plot(x='Country_Code', kind='bar',ax=ax,figsize=(8,6))
 
-# adding labels & titles to plots:
+# adding the axes labels & title to the plot:
 plt.title('HDI Values and its Components across BRICS Members in 2019',fontsize=14)
 plt.ylabel('HDI values & its components',fontsize=12)
 plt.xlabel('BRICS member countries',fontsize=12)
 
-# display legend by renaming the legend labels and adding title to legend:
+# adding a legend and customizing it:
 plt.legend(['HDI Value','GNI per capita','Life expectancy at birth','Expected years of schooling', 'Mean years of schooling'],framealpha=0.5
            ,loc='center right',title='Components for calculating HDI values:-')
 
+# finally displaying the plot
 plt.show()
+
 
 
 ## Visualizing Trends in GDP per Capita for BRICS members (2015-19)

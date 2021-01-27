@@ -592,8 +592,8 @@ print(Demographic_dict2)
 ## Chart 2 - Visualizing Demographic Indicators across BRICS Members in 2019 -
 # creating a Figure and Axes objects (2 rows and 1 column) and defining the figure size:
 fig,ax = plt.subplots(2,1,figsize=(10,8))
-# Making Subplot 1 - plotting the top plot as bar chart for Total population & Share of Urban Population in 2019:
-# plotting the bar chart for Total population in 2019:
+# Making Subplot 1 - plotting the top plot as a mix of Total population & Share of Urban Population in 2019:
+# plotting the bar chart for Total population in 2019 on the first y-axis object:
 ax[0].bar(Demographic_dict2['Country_Code'], Demographic_dict2['Total population (millions)'], color="red",alpha = 0.5)
 # setting the y-axis label and customizing it:
 ax[0].set_ylabel("Population (millions)",color="red",fontsize=13)
@@ -604,10 +604,10 @@ ax2.plot(Demographic_dict2['Country_Code'], Demographic_dict2["Urban population 
 # setting the  label for twin y-axis and customizing it:
 ax2.set_ylabel("Urban population (%)",color="blue",fontsize=13)
 
-# Making Subplot 2 - plotting the top plot as bar chart for Total population & Sex ratio at birth (M to F) in 2019:
-# plotting the bar chart for Total population in 2019:
+# Making Subplot 2 - plotting the bottom plot as a mix of Total population & Sex ratio at birth (M to F) in 2019:
+# plotting the bar chart for Total population in 2019 on the first y-axis object:
 ax[1].bar(Demographic_dict2['Country_Code'], Demographic_dict2['Total population (millions)'], color="red",alpha = 0.5)
-# setting the x-axis label:
+# setting the x-axis label on the bottom plot axis:
 ax[1].set_xlabel("BRICS member countries ",fontsize=13)
 # setting y-axis label and customizing it:
 ax[1].set_ylabel("Population (millions)",color="red",fontsize=13)
@@ -981,7 +981,7 @@ df = Trade_Finance_merged[['Country_Code', 'Exports and imports (% of GDP)', 'FD
                            'Remittances, inflows (% of GDP)']]
 # setting the Country_Code column in the merged DataFrame as the index:
 df.set_index('Country_Code', inplace=True)
-# defining the indicator column names as a list & assigning it to a variable labels:
+# defining the indicator column names as a list & assigning it to a variable label to be used later in the chart legend:
 label = ['Exports & Imports', 'FDI (net inflows)', 'Gross fixed capital formation', 'Private capital flows',
          'Remittances (inflows)']
 
@@ -1011,119 +1011,131 @@ plt.show()
 
 
 
-### Calculating Human Development Index (HDI) values for BRICS members -
-import pandas as pd
-
+### Calculating Human Development Index (HDI) Value for 2019 for each BRICS Member:-
+### Using the HDRO Statistical Data API -
+## Step 1 - Creating a BRICS HDI Value DataFrame as a sample at first:
 BRICS_HDI_values = Health_dict2[["Country_Code","Year"]]
+# printing the sample DataFrame created:
 print(BRICS_HDI_values)
 
-# Step 1 - Setting the Minimum and Maximum value goalposts -
+## Step 2 - Setting the Minimum and Maximum value Goalposts for each of the 3 Dimensions -
+# loading the Pandas library (alias as pd):
 import pandas as pd
-
-# initialize list of lists
+# initializing a list of lists to create goalpost values for each HDI Dimension:
 goalposts = [['Health', 'Life expectancy (years)', 20, 85], ['Education', 'Expected years of schooling (years)', 0, 18],
              ['Education', 'Mean years of schooling (years)', 0, 15],
              ['Standard of living', 'GNI per capita (2017 PPP$)', 100, 75000]]
-
-# Create the pandas DataFrame
+# creating a pandas DataFrame for goalposts and assigning relevant column names:
 goalposts_df = pd.DataFrame(goalposts, columns=['Dimension', 'Indicator', 'Minimum', 'Maximum'])
-
-# print dataframe.
+# printing the Goalposts DataFrame:
 print(goalposts_df)
 
-
-# Health Indicator Goalposts -
+# assigning Health Indicator Goalposts to respective variables:
 Health_Minimum_value = goalposts_df['Minimum'][0]
 Health_Maximum_value = goalposts_df['Maximum'][0]
 
-# Education Indicator Goalposts -
+# assigning Education Indicator Goalposts to respective variables:
 Edu_exp_yrs_school_Minimum_value = goalposts_df['Minimum'][1]
 Edu_exp_Yrs_school_Maximum_value = goalposts_df['Maximum'][1]
 Edu_mean_Yrs_school_Minimum_value = goalposts_df['Minimum'][2]
 Edu_mean_Yrs_school_Maximum_value = goalposts_df['Maximum'][2]
 
-# Standard of living Indicator Goalposts -
+# assigning Standard of living Indicator Goalposts to respective variables:
 Living_Stand_Minimum_value = goalposts_df['Minimum'][3]
 Living_Stand_Maximum_value = goalposts_df['Maximum'][3]
 
 
-# Step 2 - Calculating the Dimension Indices -
-# Dimension Index For Health:
+## Step 3 - Calculating each of the Dimension Indices -
+# using formula: Dimension index = (actual value – minimum value) / (maximum value – minimum value)
+
+# Dimension Index For Health -
+# slicing the relevant columns from Health DataFrame and assigning it to variable Health_Indicators:
 Health_Indicators = Health_dict2[["Country_Code","Year", "Life expectancy at birth"]]
 
-## Dimension Index for Health Indicator:
-# Dimension index = (actual value – minimum value) / (maximum value – minimum value)
+# calculating the Health Dimension index (Life expectancy at birth) for each BRICS member using above formula:
 Health_Index_BRICS = []
 for i in range(5):
     Health_Dimension_Index = (Health_Indicators.iloc[i][2] - Health_Minimum_value) / (Health_Maximum_value - Health_Minimum_value)
     Health_Index_BRICS.append(Health_Dimension_Index.round(4))
+
+# printing the Health Dimension index for all members:
 print(Health_Index_BRICS)
 
-# Dimension Index For Education:
+
+
+# Dimension Index For Education -
+# slicing the relevant columns from Education DataFrame and assigning it to variables Edu_Indicator_1
+# and Edu_Indicator_2:
 Edu_Indicator_1 = Educational_dict[["Country_Code", "Year", "Expected years of schooling (years)"]]
 Edu_Indicator_2 = Educational_dict[["Country_Code", "Year", "Mean years of schooling (years)"]]
 
-## Dimension Index for Education Indicator: Expected years of schooling
+# calculating the Education Dimension index (Expected years of schooling) for each BRICS member using above formula:
 Edu_Index_1_BRICS = []
 for i in range(5):
     Edu_Dimension_Index_1 = (Edu_Indicator_1.iloc[i][2] - Edu_exp_yrs_school_Minimum_value) / (
                 Edu_exp_Yrs_school_Maximum_value - Edu_exp_yrs_school_Minimum_value)
     Edu_Index_1_BRICS.append(Edu_Dimension_Index_1.round(4))
 
-## Dimension Index for Education Indicator: Mean years of schooling
+# calculating the Education Dimension index (Mean years of schooling) for each BRICS member using above formula:
 Edu_Index_2_BRICS = []
 for i in range(5):
     Edu_Dimension_Index_2 = (Edu_Indicator_2.iloc[i][2] - Edu_mean_Yrs_school_Minimum_value) / (
                 Edu_mean_Yrs_school_Maximum_value - Edu_mean_Yrs_school_Minimum_value)
     Edu_Index_2_BRICS.append(Edu_Dimension_Index_2.round(4))
 
-
-# Calculating the Arithmetic Mean of the two resulting Education indices -
+# calculating the Arithmetic Mean of the two resulting Education indices -
 import numpy as np
 Combined_Edu_Index_BRICS = []
-
+# looping in values of each Education index to calculate its Arithmetic mean using Numpy mean function:
 for i in range(5):
     Combined_Edu_Dimension_Index = np.mean((Edu_Index_1_BRICS[i],Edu_Index_2_BRICS[i]), dtype=np.float64)
+# appending the calculated mean value to an empty list and rounding it to 2 decimal places:
     Combined_Edu_Index_BRICS.append(Combined_Edu_Dimension_Index.round(4))
 
+# printing the Mean Education Dimension index for all members:
 print(Combined_Edu_Index_BRICS)
 
 
-# Dimension Index For Standard of Living:
+# Dimension Index For Standard of Living -
+# slicing the relevant columns from Income DataFrame and assigning it to variable Living_Stand_Indicator:
 Living_Stand_Indicator = Income_dict2[["Country_Code","Year", "Gross national income (GNI) per capita"]]
 
-# Calculating the natural logarithm of the actual, minimum and maximum values for Income or Living Standard Index:
+# calculating the natural logarithm of the actual values for Living Standard Index and appending it to an empty list:
 Living_Stand_Indicator_BRICS = []
 for i in range(5):
     Living_Stand_Indicator_BRICS.append((np.log(Living_Stand_Indicator.iloc[i][2])).round(4))
-
+# printing the calculated values appended to the list:
 print(Living_Stand_Indicator_BRICS)
-
+# calculating the natural logarithm of the minimum and maximum values for Living Standard Index:
 Living_Stand_Minimum_value2 = np.log(Living_Stand_Minimum_value)
 Living_Stand_Maximum_value2 = np.log(Living_Stand_Maximum_value)
 
-# Dimension Index for Standard of Living Indicator
+# calculating the Living Standard Dimension index for each BRICS member using above formula:
 Living_Stand_BRICS = []
 for i in range(5):
     Living_Stand_BRICS.append(((Living_Stand_Indicator_BRICS[i] - Living_Stand_Minimum_value2) / (
                 Living_Stand_Maximum_value2 - Living_Stand_Minimum_value2)).round(4))
 
+# printing the Living Standard Dimension index for all members:
 print(Living_Stand_BRICS)
 
 
-## Step 3 - Aggregating the dimensional indices -
-# HDI is the geometric mean of the three dimensional indices:
-import numpy as np
+## Step 4 - Aggregating the Dimensional Indices (Note - HDI is the geometric mean of the three dimensional indices):
+# importing gmean function from scipy to calculate the geometric mean of indices:
 from scipy.stats.mstats import gmean
 
+# calculating the geometric mean of 3 dimensional indices for each of the BRICS members:
 BRICS_HDI_2019 = []
 for i in range(5):
     HDI = gmean([Health_Index_BRICS[i], Combined_Edu_Index_BRICS[i], Living_Stand_BRICS[i]])
     BRICS_HDI_2019.append(HDI.round(3))
 
+# printing the calculated HDI values appended to the empty list:
 print(BRICS_HDI_2019)
-BRICS_HDI_values['HDI Value'] = BRICS_HDI_2019
 
+# appending the calculated HDI values as a ne column to the sample DataFrame created at first in Step 1:
+BRICS_HDI_values['HDI Value'] = BRICS_HDI_2019
+# finally printing the BRICS_HDI_values sample DataFrame:
 print(BRICS_HDI_values)
 
 

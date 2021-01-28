@@ -1304,39 +1304,45 @@ import matplotlib.pyplot as plt
 # creating a Figure and Axes objects (3 rows and 1 column) and defining the figure size of the chart:
 fig, ax = plt.subplots(3,1, figsize=(12,10))
 
-# plotting line plots for each Country_Code and customizing it with line colors, markers shape & grid lines:
+# Subplot 1 - plotting Line Plots for each Country_Code and customizing it with line colors, markers shape & grid lines:
 new_result['BRA'].plot(ax=ax[0], label='Brazil', x=new_result.iloc[0],marker='o',color='red',grid=True)
 new_result['CHN'].plot(ax=ax[0], label='China', x=new_result.iloc[1],marker='o',color='green',grid=True)
 new_result['IND'].plot(ax=ax[0], label='India', x=new_result.iloc[2],marker='o',color='blue',grid=True)
 new_result['RUS'].plot(ax=ax[0], label='Russia', x=new_result.iloc[3],marker='o',color='black',grid=True)
 new_result['ZAF'].plot(ax=ax[0], label='South Africa', x=new_result.iloc[4],marker='o',color='orange',grid=True)
 
-# setting the title of the plot:
-ax[0].set_title('Line Plot & Box Plot for Trends in GDP per capita for BRICS Members (2015-19)',fontsize=14)
-# labeling the y-axes for both the line & box plot as a combined one:
-ax[0].set_ylabel('GDP per capita (2017 PPP) $',fontsize=12)
 
-
-
-# customizing the display different elements:
+# Subplot 2 - defining the Boxplot customization properties and assigning them to variables for further use:
+# specifying the style of the box as a dictionary:
 boxprops = dict(linestyle='-', linewidth=2, color='black')
+# specifying the style of the median as a dictionary:
 medianprops = dict(linestyle='-', linewidth=2, color='black')
 
+# plotting the boxplot and customizing it with properties specified earlier:
 new_result.boxplot(column =['BRA','CHN','IND','RUS','ZAF'], grid = True, boxprops=boxprops,medianprops=medianprops,ax=ax[1])
 
-#ax[1].set_ylabel('GDP per capita (2017 PPP) $',fontsize=12)
 
-ax[0].legend(loc='upper right',title='BRICS members',framealpha=0.5)
-
-# adding  a table with Box plot components for BRICS members:
+# Subplot 3 - adding a Matplotlib Table specifying all the Box plot components for each BRICS member:
+# specifying the Boxplot Components DataFrame as the data source to be used to make the table:
 table = BRICS_boxplot_df
+# defining the text to be placed in the table by slicing the boxplot DataFrame and appending to an empty list variable:
 cell_text = []
 for row in range(len(table)):
     cell_text.append(table.iloc[row])
 
+# creating the table and customizing it by specifying parameters:
 ax[2].table(cellText=cell_text, colLabels=table.columns, loc='center',rowLabels=BRICS_members,fontsize=13)
+# turning off the axes for the Table subplot:
 ax[2].axis('off')
 
+# setting the title of the plot:
+ax[0].set_title('Line Plot & Box Plot for Trends in GDP per capita for BRICS Members (2015-19)',fontsize=14)
+# labeling the y-axes for both the line & box plot as a combined one:
+ax[0].set_ylabel('GDP per capita (2017 PPP) $',fontsize=12)
+# adding a legend to the first subplot (Line plot) and customizing it:
+ax[0].legend(loc='upper right',title='BRICS members',framealpha=0.5)
+
+# finally displaying the plot:
 plt.show()
 
 
@@ -1345,56 +1351,62 @@ plt.show()
 
 
 ## Data Source 3 - Excel File from HDI API Website:
-
+## Step 1 - Importing the data into Pandas DataFrame and cleaning it -
+# loading Pandas library (alias pd):
 import pandas as pd
 # library to read xlsx format excel file:
 import openpyxl
 
+# importing the excel file data into Pandas DataFrame and assigning it to a variable:
 data = pd.read_excel('2020_Statistical_Annex_Table_2.xlsx',skiprows=3)
-
-# Drop Columns with Missing Values:
+# dropping columns with missing (NaN) values:
 data = data.dropna(how='all', axis=1)
-
-# Drop Rows with Missing Values:
+# dropping rows with missing (NaN) values:
 data = data.dropna(how='all',axis=0)
-
-# Set Column headers for the DataFrame:
+# setting the first row of the DataFrame as the variable for column headers:
 new_header = data.iloc[0]
+# setting the rest of the rows of DataFrame as the variable for the body of data:
 data = data[2:]
-
+# assigning the column header variable to the columns as headers:
 data.columns = new_header
+# displaying the top 7 rows of the cleaned DataFrame:
 print(data.head(7))
 
-
+## Step 2 - Data Manipulation - slicing the BRICS member data only from the DataFrame:
+# assigning the BRICS countries to a list variable:
 BRICS_members = ['Brazil','China','India','Russian Federation','South Africa']
-
+# slicing BRICS member data only from the cleaned excel DataFrame and assigning it to a variable:
 BRICS_df = data[data['Country'].isin(BRICS_members)]
-
+# creating a list variable for Country Code for each BRICS member:
 country_code_list = ['RUS','BRA','CHN','ZAF','IND']
+# adding this list as the Country_Code column to the sliced BRICS DataFrame:
 BRICS_df['Country_Code'] = country_code_list
+# setting the Country_Code as the index of BRICS DataFrame:
 BRICS_df.set_index('Country_Code',inplace = True)
-
-# Deleting column 'a' from DataFrame:
+# deleting a column from BRICS DataFrame:
 del BRICS_df['a']
+# printing the cleaned BRICS DataFrame:
 print(BRICS_df)
 
-# Above code showing KeyError for year 2014 column:
+## Step 3 - Formatting the BRICS DataFrame once sliced:
+# debugging the KeyError generated for the year 2014 column by enlisting the column names as a list:
 print(BRICS_df.columns.tolist())
-
-# Renaming column for year 2014 as it was giving KeyError due to incorrect format for column header:
+# renaming the column for year 2014 as it was giving KeyError due to incorrect format for column header:
 BRICS_df.rename(columns={2014:'2014'},inplace=True)
-
+# re-printing the column names after modifying code:
 print(BRICS_df.columns.tolist())
-
-
+# creating a list variable comprising all the years:
 years = ['1990','2000','2010','2014','2015','2017','2018','2019']
+
+# slicing the BRICS DataFrame to show each BRICS member data as a variable:
 Russia_data = BRICS_df.iloc[0,2:10]
 Brazil_data = BRICS_df.iloc[1,2:10]
 China_data = BRICS_df.iloc[2,2:10]
 South_Africa_data = BRICS_df.iloc[3,2:10]
 India_data = BRICS_df.iloc[4,2:10]
 
-# Calculating percentage change between the current and a prior year for each country:
+# calculating percentage change between the current and a prior year for each BRICS country
+# and storing it into a variable:
 Russia_data2 = BRICS_df.iloc[0,2:10].pct_change()
 Brazil_data2 = BRICS_df.iloc[1,2:10].pct_change()
 China_data2 = BRICS_df.iloc[2,2:10].pct_change()
@@ -1402,35 +1414,53 @@ South_Africa_data2 = BRICS_df.iloc[3,2:10].pct_change()
 India_data2 = BRICS_df.iloc[4,2:10].pct_change()
 
 
-import matplotlib.pyplot as plt
-import matplotlib.ticker as mtick
+## Step 4 - Building visualizations from cleaned & formatted BRICS DataFrame:
+## Chart - Visualizing the Trends in HDI Values & HDI Value Changes among BRICS Members during 1990-2019 -
 
-# Chart 1 - Line Chart for trends in HDI Values of BRICS members during 1990-2019:
+import matplotlib.pyplot as plt
+#import matplotlib.ticker as mtick
+
+##  Subplot 1 - Line Chart for Trends in HDI Values among BRICS members (1990-2019):
+# creating a Figure and Axes objects (2 rows and 1 column) and defining the figure size of the chart:
 fig, ax = plt.subplots(2,1, figsize=(12,10))
+
+# plotting the line plots for each BRICS member's HDI value on the y-axis & years on the x-axis then customizing it:
 ax[0].plot(years,Russia_data,label='RUS',marker='s',linestyle='-.')
 ax[0].plot(years,Brazil_data,label='BRA',marker='s',linestyle='-.')
 ax[0].plot(years,China_data,label='CHN',marker='s',linestyle='-.')
 ax[0].plot(years,South_Africa_data,label='ZAF',marker='s',linestyle='-.')
 ax[0].plot(years,India_data,label='IND',marker='s',linestyle='-.')
+
+# adding a legend to the subplot:
 ax[0].legend(loc='lower right')
+# setting a title for the top line plot (subplot 1):
 ax[0].set_title('Trends in HDI values among BRICS Members (1990-2019)',fontsize=14)
+# adding axes labels to the subplot:
 ax[1].set_xlabel('Years',fontsize=13)
 ax[0].set_ylabel('HDI values',fontsize=13)
 
+
+##  Subplot 2 - Line Chart for Trends in HDI Value Changes (%) among BRICS members (1990-2019):
+# plotting the line plots for each BRICS member's HDI value percent change on the y-axis & years
+# on the x-axis then customizing it:
 ax[1].plot(years,Russia_data2,label='RUS',marker='s')
 ax[1].plot(years,Brazil_data2,label='BRA',marker='s')
 ax[1].plot(years,China_data2,label='CHN',marker='s')
 ax[1].plot(years,South_Africa_data2,label='ZAF',marker='s')
 ax[1].plot(years,India_data2,label='IND',marker='s')
+
+# adding a legend to the subplot:
 ax[1].legend(loc='upper right')
-ax[1].set_title('Trends in HDI values Changes (%) among BRICS Members (1990-2019)',fontsize=14)
+# setting a title for the bottom line plot (subplot 2):
+ax[1].set_title('Trends in HDI Value Changes (%) among BRICS Members (1990-2019)',fontsize=14)
+# adding y-axis label to the subplot:
 ax[1].set_ylabel('Change in HDI values',fontsize=13)
 
-# setting the y-axis ticks in percent format for the second subplot:
+# customizing the y-tick labels in percent format for the second subplot:
 vals = ax[1].get_yticks()
 ax[1].set_yticklabels(['{:,.1%}'.format(x) for x in vals])
 
-
+# finally displaying the plot:
 plt.show()
 
 

@@ -1229,71 +1229,96 @@ plt.show()
 
 
 
-## Visualizing Trends in GDP per Capita for BRICS members (2015-19)
+## Chart 2 - Visualizing Trends in GDP per capita (2017 PPP $) for BRICS members (2015-19)
+# Step 1 - Querying the API, Retrieving the Data and Importing it into Pandas DataFrame -
+# loading Pandas library (alias as pd):
 import pandas as pd
-
-# Step 1 - Importing Data from HDI API putting it into Pandas DataFrame:
+# loading the requests library:
+import requests
+# packaging the request, sending it to retrieve GDP per capita data (2015-19) for each BRICS member:
 response = requests.get('http://ec2-54-174-131-205.compute-1.amazonaws.com/API/HDRO_API.php/country_code=BRA,RUS,IND,CHN,ZAF/indicator_id=194906/year=2015,2016,2017,2018,2019/structure=ciy')
-Life_exp_birth = response.json()
-my_dict30 = pd.DataFrame(Life_exp_birth['indicator_value'].items())
-my_dict30.rename(columns={0:'Country_Code',1:'Health_Indicator'}, inplace=True)
+# # getting the API response in JSON format and assigning it to a variable:
+GDP_trends = response.json()
+# importing the JSON response into Pandas DataFrame, iterating over its content and assigning it to another variable:
+my_dict50 = pd.DataFrame(GDP_trends['indicator_value'].items())
+# renaming the columns extracted from the DataFrame:
+my_dict50.rename(columns={0:'Country_Code',1:'GDP_Indicator'}, inplace=True)
 
-# Step 2 - Putting it into Pandas DataFrame:
-df_a = pd.DataFrame.from_dict((my_dict30['Health_Indicator'][0]),orient='index')
-df_b = pd.DataFrame.from_dict((my_dict30['Health_Indicator'][1]),orient='index')
-df_c = pd.DataFrame.from_dict((my_dict30['Health_Indicator'][2]),orient='index')
-df_d = pd.DataFrame.from_dict((my_dict30['Health_Indicator'][3]),orient='index')
-df_e = pd.DataFrame.from_dict((my_dict30['Health_Indicator'][4]),orient='index')
+# Step 2 - Combining all the data & putting dictionary data into Pandas DataFrame:
+df_a = pd.DataFrame.from_dict((my_dict50['GDP_Indicator'][0]),orient='index')
+df_b = pd.DataFrame.from_dict((my_dict50['GDP_Indicator'][1]),orient='index')
+df_c = pd.DataFrame.from_dict((my_dict50['GDP_Indicator'][2]),orient='index')
+df_d = pd.DataFrame.from_dict((my_dict50['GDP_Indicator'][3]),orient='index')
+df_e = pd.DataFrame.from_dict((my_dict50['GDP_Indicator'][4]),orient='index')
 
-# Step 3 - Combining the individual DataFrames for each Country & Year:
+# Step 3 - Combining the individual DataFrames for each Country & Year using the concat function:
 frames = [df_a, df_b, df_c,df_d,df_e]
+# storing the combined DataFrame in a variable:
 result = pd.concat(frames)
+# creating a column for Country Code in the combined DataFrame:
 result['Country_Code'] = ['BRA','CHN','IND','RUS','ZAF']
+# renaming the year columns of the combined DataFrame:
 result2 = result[['Country_Code','2015','2016','2017','2018','2019']]
+# setting the Country_Code column as index of the DataFrame:
 result2.set_index('Country_Code',inplace=True)
+# print the cleaned & formatted Combined DataFrame:
+print(result2)
 
-# Step 4 - Transposing the DataFrame to show Country_Code as column headers:
+# Step 4 - Transposing the Combined DataFrame to show Country_Code as column headers and years in index:
 new_result = result2.transpose().round(2)
+# printing the transposed DataFrame:
 print(new_result)
 
-
-# Create a DataFrame for Boxplot Components - Minimum, Maximum, Median, First Quartile or 25% and Third Quartile or 75%:
+# Step 5 - Creating a DataFrame for Boxplot Components - Minimum, Maximum, Median, First Quartile or 25% and Third Quartile or 75%:
+# assigning the Country Codes of BRICS members to a list & storing it as a variable:
 BRICS_members = ['BRA','CHN','IND','RUS','ZAF']
+# creating a dictionary with each Country Code as a keys but empty values as embedded lists:
 BRICS_Dict = {'BRA': [],'CHN' : [], 'IND' : [], 'RUS' : [], 'ZAF' : []}
-
+# getting values from the transposed DataFrame columns & calculating boxplot component for each then,
+# appending each boxplot component to their respective country keys as a value in the embedded list:
 for i in BRICS_members:
     BRICS_Dict[i].append(new_result[i].min())
     BRICS_Dict[i].append(new_result[i].max())
     BRICS_Dict[i].append(new_result[i].median())
     BRICS_Dict[i].append(new_result[i].quantile(.25))
     BRICS_Dict[i].append(new_result[i].quantile(.75))
-# Creating the DataFrame:
+
+# printing the dictionary with all the key-value pairs:
+print(BRICS_Dict)
+# creating a DataFrame from the dictionary key-value pairs and assigning it to a variable:
 BRICS_boxplot = pd.DataFrame(BRICS_Dict)
-# transposing the DataFrame to show Components as columns:
+# transposing the DataFrame to show each Boxplot component as a column while each Country code as index:
 BRICS_boxplot_df = BRICS_boxplot.transpose()
-# Setting the Column names of DataFrame:
+# setting the names of DataFrame columns once transposed:
 BRICS_boxplot_df.columns =['Minimum','Maximum','Median', 'First Quartile','Third Quartile']
+# printing the Boxplot DataFrame:
 print(BRICS_boxplot_df)
 
 
-# Step 5 - Visualizing Trends in GDP per Capita for BRICS members:
 
+
+
+## Chart 3- Visualizing Trends in GDP per Capita for BRICS members as a Line Plot, Box Plot & a Table:
+# loading Matplotlib library (alias as plt):
 import matplotlib.pyplot as plt
-
-
+# creating a Figure and Axes objects (3 rows and 1 column) and defining the figure size of the chart:
 fig, ax = plt.subplots(3,1, figsize=(12,10))
 
-# plotting line plots for each Country_Code:
+# plotting line plots for each Country_Code and customizing it with line colors, markers shape & grid lines:
 new_result['BRA'].plot(ax=ax[0], label='Brazil', x=new_result.iloc[0],marker='o',color='red',grid=True)
 new_result['CHN'].plot(ax=ax[0], label='China', x=new_result.iloc[1],marker='o',color='green',grid=True)
 new_result['IND'].plot(ax=ax[0], label='India', x=new_result.iloc[2],marker='o',color='blue',grid=True)
 new_result['RUS'].plot(ax=ax[0], label='Russia', x=new_result.iloc[3],marker='o',color='black',grid=True)
 new_result['ZAF'].plot(ax=ax[0], label='South Africa', x=new_result.iloc[4],marker='o',color='orange',grid=True)
 
+# setting the title of the plot:
 ax[0].set_title('Line Plot & Box Plot for Trends in GDP per capita for BRICS Members (2015-19)',fontsize=14)
+# labeling the y-axes for both the line & box plot as a combined one:
 ax[0].set_ylabel('GDP per capita (2017 PPP) $',fontsize=12)
 
-# customize the display different elements:
+
+
+# customizing the display different elements:
 boxprops = dict(linestyle='-', linewidth=2, color='black')
 medianprops = dict(linestyle='-', linewidth=2, color='black')
 

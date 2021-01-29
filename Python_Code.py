@@ -239,6 +239,54 @@ plt.show()
 
 
 
+## Chart 5 - Seaborn Visualization of the  Distribution of GDP per Capita across Continents as a Box Plot -
+# Step 1 - Creating groups of Continents and assigning Region column data to each group of Continents
+Asia_Continents = ['SouthernAsia', 'WesternAsia', 'South-easternAsia', 'EasternAsia', 'CentralAsia']
+Europe_Continents = ['SouthernEurope', 'WesternEurope', 'EasternEurope', 'NorthernEurope']
+Africa_Continents = ['NorthernAfrica', 'MiddleAfrica', 'WesternAfrica', 'SouthernAfrica', 'EasternAfrica']
+America_Continents = ['SouthAmerica','CentralAmerica','NorthernAmerica','Caribbean']
+Oceania_Continents = ['Melanesia', 'Micronesia', 'Polynesia', 'Oceania']
+
+# Step 2 - Looping through the DatFrame to assign Continents to each Region:
+list_continents = []
+
+for i in range(0,229):
+    if data.Region[i] in Asia_Continents:
+        list_continents.append('Asia')
+    elif data.Region[i] in Europe_Continents:
+        list_continents.append('Europe')
+    elif data.Region[i] in Africa_Continents:
+        list_continents.append('Africa')
+    elif data.Region[i] in America_Continents:
+        list_continents.append('America')
+    elif data.Region[i] in Oceania_Continents:
+        list_continents.append('Oceania')
+
+# Step 3 - Using DataFrame.insert() function to add a column 'Continent' to the DataFrame;
+data.insert(2, "Continent",list_continents, True)
+# Step 4 - Printing the top 5 rows of the DataFrame:
+print(data.head())
+
+# Step 6 - Plotting the Box Plot of the Distribution using Seaborn library:
+# loading Seaborn library (alias as sns)
+import seaborn as sns
+# creating a Figure and Axes objects (2 rows and 3 columns) and defining the figure size of the chart:
+fig, ax = plt.subplots(figsize=(10,8))
+# plotting a Boxplot of the GDP per capita (current US$) across Continents:
+ax = sns.boxplot(x='Continent', y='GDP per capita (current US$)',data=data)
+
+# adding the axes labels to the Boxplot:
+plt.xlabel('Continents', fontsize= 12)
+plt.ylabel('GDP per capita (current US$)',fontsize= 12)
+
+# adding a plot title:
+plt.title("Distribution of GDP per capita across Continents", fontsize= 15)
+
+# finally displaying the plot:
+plt.show()
+
+
+
 
 
 ### Data Source 2 - Data from Human Development Data Center - Using HDRO Statistical Data API -

@@ -1512,4 +1512,12 @@ ax[1].set_yticklabels(['{:,.1%}'.format(x) for x in vals])
 plt.show()
 
 
+##### Sample Code using Function in Python Code -
+### Creating a Function using the def keyword:
+# Function to Rename the columns for Indicator 1, 2 and 3:
+#def rename_columns(df,column_1,column_2,column_3):
+ #   df_new = df.rename(columns={'Indicator_1': column_1,'Indicator_2': column_2,'Indicator_3': column_3})
+  #  return df_new
 
+# Calling the Function:
+#rename_columns(Health_dict2,'Life expectancy at birth','Life expectancy at birth, Female','Life expectancy at birth, Male')

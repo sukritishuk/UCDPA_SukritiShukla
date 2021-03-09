@@ -10,7 +10,6 @@ UCD Professional Academy - Professional Certificate in Data Analytics **Final Pr
 
 Prepared by - [Sukriti Shukla](https://www.linkedin.com/in/sukriti-shukla-3989a819/)
 
-![pexels-slondotpics-408503](https://user-images.githubusercontent.com/50409210/110471466-10e81780-80d4-11eb-9e34-72531e1366dd.jpg)
-
-Photo by slon_dot_pics from Pexels
+https://www.pexels.com/photo/person-holding-world-globe-facing-mountain-346885/
+Photo by Porapak Apichodilok from Pexels
 

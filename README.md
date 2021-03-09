@@ -2,7 +2,7 @@
 
 # **Understanding the Human Development Index (HDI) among BRICS Members - analysing Real-World Scenarios**
 
-### (Visualizing insights using Python)
+## (Visualizing insights using Python)
 
 UCD Professional Academy - Professional Certificate in Data Analytics **Final Project**
 
